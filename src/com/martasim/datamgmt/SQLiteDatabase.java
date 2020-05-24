@@ -1,6 +1,7 @@
 package com.martasim.datamgmt;
 
 import com.martasim.models.Bus;
+import com.martasim.models.Event;
 import com.martasim.models.Route;
 import com.martasim.models.Stop;
 
@@ -12,247 +13,229 @@ public class SQLiteDatabase implements Database {
 
     final static int DEFAULT_TIMEOUT = 30;
     Connection connection;
+    Statement statement;
     int timeout;
 
-    public SQLiteDatabase() {
+    public SQLiteDatabase() throws SQLException {
         this(DEFAULT_TIMEOUT);
     }
 
-    public SQLiteDatabase(int timeout) {
+    public SQLiteDatabase(int timeout) throws SQLException {
         this.timeout = timeout;
-        try {
-            connection = DriverManager.getConnection("jdbc:sqlite:MartaSimulation.db");
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
+        connection = DriverManager.getConnection("jdbc:sqlite:MartaSimulation.db");
+        statement = connection.createStatement();
+        statement.setQueryTimeout(timeout);
 
-            statement.executeUpdate("DROP TABLE IF EXISTS " + Bus.SQLITE_TABLE_NAME);
-            statement.executeUpdate("CREATE TABLE " + Bus.SQLITE_DESCRIPTION);
-            statement.executeUpdate("DROP TABLE IF EXISTS " + Route.SQLITE_TABLE_NAME);
-            statement.executeUpdate("CREATE TABLE " + Route.SQLITE_DESCRIPTION);
-            statement.executeUpdate("DROP TABLE IF EXISTS " + Stop.SQLITE_TABLE_NAME);
-            statement.executeUpdate("CREATE TABLE " + Stop.SQLITE_DESCRIPTION);
+        statement.executeUpdate("DROP TABLE IF EXISTS bus");
+        statement.executeUpdate("CREATE TABLE bus (id integer, route integer, location integer, passengers integer, passengerCapacity integer, fuel real, fuelCapacity real, speed real)");
+        statement.executeUpdate("DROP TABLE IF EXISTS route");
+        statement.executeUpdate("CREATE TABLE route (id INTEGER, number INTEGER, name STRING)");
+        statement.executeUpdate("DROP TABLE IF EXISTS routeToStop");
+        statement.executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, routeIndex INTEGER)");
+        statement.executeUpdate("DROP TABLE IF EXISTS stop");
+        statement.executeUpdate("CREATE TABLE stop (id INTEGER, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
+        statement.executeUpdate("DROP TABLE IF EXISTS event");
+        statement.executeUpdate("CREATE TABLE event (time INTEGER, type STRING, id INTEGER)");
 
+    }
+
+    @Override
+    public void close() throws SQLException {
+        if (statement != null) {
             statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
+        }
+        if (connection != null) {
+            connection.close();
         }
     }
 
     @Override
-    public void close() {
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            System.exit(0);
-        }
+    public void addBus(Bus bus) throws SQLException {
+        statement.executeUpdate("INSERT INTO bus values" + bus);
     }
 
     @Override
-    public void add_bus(Bus bus) {
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            statement.executeUpdate("INSERT INTO " + Bus.SQLITE_TABLE_NAME + " values" + bus);
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
-        }
+    public void addEvent(Event event) throws SQLException {
+        statement.executeUpdate("INSERT INTO event values" + event);
     }
 
     @Override
-    public void add_route(Route route) {
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            statement.executeUpdate("INSERT INTO " + Route.SQLITE_TABLE_NAME + " values" + route);
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
-        }
+    public void addRoute(Route route) throws SQLException {
+        statement.executeUpdate("INSERT INTO route values" + route);
     }
 
     @Override
-    public void add_stop(Stop stop) {
-
+    public void addStop(Stop stop) throws SQLException {
+        statement.executeUpdate("INSERT INTO stop values" + stop);
     }
 
     @Override
-    public void update_bus(Bus bus) {
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            statement.executeUpdate(String.format("UPDATE %s SET route=%d, location=%d, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
-                    Bus.SQLITE_TABLE_NAME, bus.getRoute().getId(), bus.getLocation(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
-            ));
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
-        }
+    public void updateBus(Bus bus) throws SQLException {
+        statement.executeUpdate(String.format("UPDATE bus SET route=%d, location=%d, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
+                 bus.getRoute().getId(), bus.getLocation(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
+        ));
     }
 
     @Override
-    public void update_route(Route route) {
-
+    public void extendRoute(Route route, Stop stop) throws SQLException {
+        statement.executeUpdate(String.format("INSERT INTO routeToStop values (%d, %d, %d)", route.getId(), stop.getId(), route.getStops().size()));
+        route.extend(stop);
     }
 
     @Override
-    public void update_stop(Stop stop) {
-
+    public void updateStop(Stop stop) throws SQLException {
+        statement.executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%d",
+                stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
     }
 
     @Override
-    public Bus get_bus(int id) {
+    public Bus getBus(int id) throws SQLException {
         Bus bus = null;
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + Bus.SQLITE_TABLE_NAME + " WHERE id=" + id);
-            if (resultSet.next()) {
-                bus = get_bus(resultSet);
-            }
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM bus WHERE id=" + id);
+        if (resultSet.next()) {
+            bus = getBus(resultSet);
         }
         return bus;
     }
 
-    public Bus get_bus(ResultSet resultSet) {
-        try {
-            return new Bus(
-                    resultSet.getInt("id"),
-                    get_route(resultSet.getInt("route")),
-                    resultSet.getInt("location"),
-                    resultSet.getInt("passengers"),
-                    resultSet.getInt("passengerCapacity"),
-                    resultSet.getDouble("fuel"),
-                    resultSet.getDouble("fuelCapacity"),
-                    resultSet.getDouble("speed")
-            );
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
-        }
-        return null;
+    private Bus getBus(ResultSet resultSet) throws SQLException {
+        return new Bus(
+                resultSet.getInt("id"),
+                getRoute(resultSet.getInt("route")),
+                resultSet.getInt("location"),
+                resultSet.getInt("passengers"),
+                resultSet.getInt("passengerCapacity"),
+                resultSet.getDouble("fuel"),
+                resultSet.getDouble("fuelCapacity"),
+                resultSet.getDouble("speed")
+        );
+    }
+
+    private Event getEvent(ResultSet resultSet) throws SQLException {
+        return new Event(
+                resultSet.getInt("id"),
+                resultSet.getString("location"),
+                resultSet.getInt("passengers")
+        );
     }
 
     @Override
-    public Route get_route(int id) {
+    public Route getRoute(int id) throws SQLException {
         Route route = null;
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + Route.SQLITE_TABLE_NAME + " WHERE id=" + id);
-            if (resultSet.next()) {
-                route = get_route(resultSet);
-            }
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM route WHERE id=" + id);
+        if (resultSet.next()) {
+            route = getRoute(resultSet);
         }
         return route;
     }
 
-    private Route get_route(ResultSet resultSet) {
-        try {
-            return new Route(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("number"),
-                    resultSet.getString("name")
-            );
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
+    private Route getRoute(ResultSet resultSet) throws SQLException {
+        return new Route(
+                resultSet.getInt("id"),
+                resultSet.getInt("number"),
+                resultSet.getString("name"),
+                getAllStops(resultSet.getInt("id"))
+        );
+    }
+
+    @Override
+    public Stop getStop(int id) throws SQLException {
+        Stop stop = null;
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM stop WHERE id=" + id);
+        if (resultSet.next()) {
+            stop = getStop(resultSet);
         }
-        return null;
+        return stop;
+    }
+
+    private Stop getStop(ResultSet resultSet) throws SQLException {
+        return new Stop (
+                resultSet.getInt("id"),
+                resultSet.getString("name"),
+                resultSet.getInt("riders"),
+                resultSet.getDouble("latitude"),
+                resultSet.getDouble("longitude")
+        );
     }
 
     @Override
-    public Stop get_stop(int id) {
-        return null;
-    }
-
-    @Override
-    public List<Bus> get_all_busses() {
+    public List<Bus> getAllBusses() throws SQLException {
         List<Bus> busses = new ArrayList<>();
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet rs = statement.executeQuery("SELECT * FROM " + Bus.SQLITE_TABLE_NAME);
-            while (rs.next()) {
-                busses.add(new Bus(
-                        rs.getInt("id"),
-                        get_route(rs.getInt("route")),
-                        rs.getInt("location"),
-                        rs.getInt("passengers"),
-                        rs.getInt("passengerCapacity"),
-                        rs.getDouble("fuel"),
-                        rs.getDouble("fuelCapacity"),
-                        rs.getDouble("speed")
-                ));
-            }
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
+        ResultSet rs = statement.executeQuery("SELECT * FROM bus");
+        while (rs.next()) {
+            busses.add(new Bus(
+                    rs.getInt("id"),
+                    getRoute(rs.getInt("route")),
+                    rs.getInt("location"),
+                    rs.getInt("passengers"),
+                    rs.getInt("passengerCapacity"),
+                    rs.getDouble("fuel"),
+                    rs.getDouble("fuelCapacity"),
+                    rs.getDouble("speed")
+            ));
         }
         return busses;
     }
 
     @Override
-    public List<Route> get_all_routes() {
+    public List<Event> getAllEvents() throws SQLException {
+        List<Event> events = new ArrayList<>();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM event");
+        while (resultSet.next()) {
+            events.add(getEvent(resultSet));
+        }
+        return events;
+    }
+
+    @Override
+    public List<Route> getAllRoutes() throws SQLException {
         List<Route> routes = new ArrayList<>();
-        try {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + Route.SQLITE_TABLE_NAME);
-            while (resultSet.next()) {
-                routes.add(get_route(resultSet));
-            }
-            statement.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            close();
-            System.exit(0);
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM route");
+        while (resultSet.next()) {
+            routes.add(getRoute(resultSet));
         }
         return routes;
     }
 
     @Override
-    public List<Stop> get_all_stops() {
-        return null;
+    public List<Stop> getAllStops() throws SQLException {
+        List<Stop> stops = new ArrayList<>();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM stop");
+        while (resultSet.next()) {
+            stops.add(getStop(resultSet));
+        }
+        return stops;
     }
 
     @Override
-    public void remove_bus(Bus bus) {
-
+    public List<Stop> getAllStops(int routeId) throws SQLException {
+        List<Stop> stops = new ArrayList<>();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId);
+        while (resultSet.next()) {
+            stops.add(getStop(resultSet.getInt("stopId")));
+        }
+        return stops;
     }
 
     @Override
-    public void remove_route(Route route) {
-
+    public void removeBus(Bus bus) throws SQLException {
+        statement.executeUpdate("DELETE FROM bus WHERE id=" + bus.getId());
     }
 
     @Override
-    public void remove_stop(Stop stop) {
+    public void removeRoute(Route route) throws SQLException {
+        statement.executeUpdate("DELETE FROM route WHERE id=" + route.getId());
+        statement.executeUpdate("DELETE FROM routeToStop WHERE routeId=" + route.getId());
+    }
 
+    @Override
+    public void removeStop(Stop stop) throws SQLException {
+        statement.executeUpdate("DELETE FROM stop WHERE id=" + stop.getId());
+        statement.executeUpdate("DELETE FROM routeToStop WHERE stopId=" + stop.getId());
+    }
+
+    @Override
+    public void removeEvent(Event event) throws SQLException {
+        statement.executeUpdate("DELETE FROM event WHERE time=" + event.getTime() + ", type=" + event.getType() + ", id=" + event.getId());
     }
 }

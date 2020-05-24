@@ -1,42 +1,52 @@
 package com.martasim.datamgmt;
 
 import com.martasim.models.Bus;
+import com.martasim.models.Event;
 import com.martasim.models.Route;
 import com.martasim.models.Stop;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface Database {
 
-    void close();
+    void close() throws SQLException;
 
-    void add_bus(Bus bus);
+    void addBus(Bus bus) throws SQLException;
 
-    void add_route(Route route);
+    void addEvent(Event event) throws SQLException;
 
-    void add_stop(Stop stop);
+    void addRoute(Route route) throws SQLException;
 
-    void update_bus(Bus bus);
+    void addStop(Stop stop) throws SQLException;
 
-    void update_route(Route route);
+    void updateBus(Bus bus) throws SQLException;
 
-    void update_stop(Stop stop);
+    void extendRoute(Route route, Stop stop) throws SQLException;
 
-    Bus get_bus(int id);
+    void updateStop(Stop stop) throws SQLException;
 
-    Route get_route(int id);
+    Bus getBus(int id) throws SQLException;
 
-    Stop get_stop(int id);
+    Route getRoute(int id) throws SQLException;
 
-    List<Bus> get_all_busses();
+    Stop getStop(int id) throws SQLException;
 
-    List<Route> get_all_routes();
+    List<Bus> getAllBusses() throws SQLException;
 
-    List<Stop> get_all_stops();
+    List<Event> getAllEvents() throws SQLException;
 
-    void remove_bus(Bus bus);
+    List<Route> getAllRoutes() throws SQLException;
 
-    void remove_route(Route route);
+    List<Stop> getAllStops() throws SQLException;
 
-    void remove_stop(Stop stop);
+    List<Stop> getAllStops(int routeId) throws SQLException;
+
+    void removeBus(Bus bus) throws SQLException;
+
+    void removeRoute(Route route) throws SQLException;
+
+    void removeStop(Stop stop) throws SQLException;
+
+    void removeEvent(Event event) throws SQLException;
 }

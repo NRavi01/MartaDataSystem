@@ -5,19 +5,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class Route {
-    public final static String SQLITE_TABLE_NAME = "route";
-    public final static String SQLITE_DESCRIPTION = "route (id INTEGER, number INTEGER, name STRING)";
-
     final int id;
     int number;
     String name;
     List<Stop> stops;
 
     public Route(int id, int number, String name) {
+        this(id, number, name, new ArrayList<>());
+    }
+
+    public Route(int id, int number, String name, List<Stop> stops) {
         this.id = id;
         this.number = number;
         this.name = name;
-        stops = new ArrayList<>();
+        this.stops = stops;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class Route {
         this.name = name;
     }
 
-    void addStop(Stop stop) {
+    public void extend(Stop stop) {
         this.stops.add(stop);
     }
 

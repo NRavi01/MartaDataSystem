@@ -3,9 +3,6 @@ package com.martasim.models;
 import java.util.Objects;
 
 public class Bus {
-    public final static String SQLITE_TABLE_NAME = "bus";
-    public final static String SQLITE_DESCRIPTION = "bus (id integer, route integer, location integer, passengers integer, passengerCapacity integer, fuel real, fuelCapacity real, speed real)";
-
     final int id;
     Route route;
     int location;

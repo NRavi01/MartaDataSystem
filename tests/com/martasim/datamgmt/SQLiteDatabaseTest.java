@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,34 +15,34 @@ class SQLiteDatabaseTest {
     SQLiteDatabase db;
 
     @BeforeEach
-    void setup() {
+    void setup() throws SQLException {
         db = new SQLiteDatabase();
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws SQLException {
         db.close();
     }
 
     @Test
-    void add_route() {
-        List<Route> routes = db.get_all_routes();
+    void add_route() throws SQLException {
+        List<Route> routes = db.getAllRoutes();
         assertEquals(0, routes.size());
 
         Route route = new Route(0, 0, "route 0");
-        db.add_route(route);
+        db.addRoute(route);
 
-        routes = db.get_all_routes();
+        routes = db.getAllRoutes();
 
         assertEquals(1, routes.size());
         assertEquals(route, routes.get(0));
     }
 
     @Test
-    void get_route() {
+    void get_route() throws SQLException {
         Route route = new Route(1, 0, "route 0");
-        db.add_route(route);
+        db.addRoute(route);
 
-        assertEquals(route, db.get_route(1));
+        assertEquals(route, db.getRoute(1));
     }
 }

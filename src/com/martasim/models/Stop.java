@@ -1,9 +1,6 @@
 package com.martasim.models;
 
 public class Stop {
-    public final static String SQLITE_TABLE_NAME = "stop";
-    public final static String SQLITE_DESCRIPTION = "stop (id integer, name string, riders integer, latitude real, longitude real)";
-
     final int id;
     String name;
     int riders;
