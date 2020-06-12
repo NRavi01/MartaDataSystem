@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface Database {
 
+    void clear() throws SQLException;
+
     void close() throws SQLException;
 
     void addBus(Bus bus) throws SQLException;

@@ -2,7 +2,7 @@ package com.martasim.datamgmt;
 
 import java.io.File;
 
-public class GtfsParser extends Parser {
+class GtfsParser extends Parser {
 
 
     GtfsParser(Database database, File file) {

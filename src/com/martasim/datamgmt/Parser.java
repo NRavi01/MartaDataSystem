@@ -2,7 +2,7 @@ package com.martasim.datamgmt;
 
 import java.io.File;
 
-public abstract class Parser {
+abstract class Parser {
     Database database;
     File file;
 

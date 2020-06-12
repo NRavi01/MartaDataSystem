@@ -5,6 +5,7 @@ import com.martasim.models.Event;
 import com.martasim.models.Route;
 import com.martasim.models.Stop;
 
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,20 @@ public class SQLiteDatabase implements Database {
     int timeout;
 
     public SQLiteDatabase() throws SQLException {
-        this(DEFAULT_TIMEOUT);
+        this("MartaSimulation.db");
     }
 
-    public SQLiteDatabase(int timeout) throws SQLException {
-        this.timeout = timeout;
-        connection = DriverManager.getConnection("jdbc:sqlite:MartaSimulation.db");
+    public SQLiteDatabase(File file) throws SQLException {
+        this(file.getAbsolutePath());
+    }
+
+    private SQLiteDatabase(String databasePath) throws SQLException {
+        connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", databasePath));
         statement = connection.createStatement();
         statement.setQueryTimeout(timeout);
+    }
 
+    public void clear() throws SQLException {
         statement.executeUpdate("DROP TABLE IF EXISTS bus");
         statement.executeUpdate("CREATE TABLE bus (id integer, route integer, location integer, passengers integer, passengerCapacity integer, fuel real, fuelCapacity real, speed real)");
         statement.executeUpdate("DROP TABLE IF EXISTS route");
@@ -36,7 +42,6 @@ public class SQLiteDatabase implements Database {
         statement.executeUpdate("CREATE TABLE stop (id INTEGER, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
         statement.executeUpdate("DROP TABLE IF EXISTS event");
         statement.executeUpdate("CREATE TABLE event (time INTEGER, type STRING, id INTEGER)");
-
     }
 
     @Override
