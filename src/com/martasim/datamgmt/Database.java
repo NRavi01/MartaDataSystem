@@ -44,11 +44,35 @@ public interface Database {
 
     List<Stop> getAllStops(int routeId) throws SQLException;
 
+    /**
+     * Removes a bus from the database.
+     *
+     * @param bus that is removed from the database
+     * @throws SQLException
+     */
     void removeBus(Bus bus) throws SQLException;
 
+    /**
+     * Removes a route from the database.
+     *
+     * @param route that is removed from the database
+     * @throws SQLException
+     */
     void removeRoute(Route route) throws SQLException;
 
+    /**
+     * Removes a stop from the database.
+     *
+     * @param stop that is removed from the database
+     * @throws SQLException
+     */
     void removeStop(Stop stop) throws SQLException;
 
+    /**
+     * Removes an event from the database.
+     *
+     * @param event that is removed from the database
+     * @throws SQLException
+     */
     void removeEvent(Event event) throws SQLException;
 }
