@@ -27,7 +27,7 @@ public class Bus {
     public String toString() {
         return "(" +
                 id + ", " +
-                route.id + ", " +
+                (route == null ? "null" : route.id) + ", " +
                 location + ", " +
                 passengers + ", " +
                 passengerCapacity + ", " +

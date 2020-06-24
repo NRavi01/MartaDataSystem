@@ -1,6 +1,6 @@
 package com.martasim.datamgmt;
 
-import com.martasim.models.Route;
+import com.martasim.models.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ class SQLiteDatabaseTest {
     @BeforeEach
     void setup() throws SQLException {
         db = new SQLiteDatabase();
+        db.clear();
     }
 
     @AfterEach
@@ -44,5 +45,71 @@ class SQLiteDatabaseTest {
         db.addRoute(route);
 
         assertEquals(route, db.getRoute(1));
+    }
+
+    @Test
+    void remove_bus() throws SQLException {
+        Route R = new Route(0, 0, "0");
+        Bus A = new Bus(0, R, 0, 0, 0, 0, 0, 0);
+        Bus B = new Bus(1, R, 1, 1, 1, 1, 1, 1);
+
+        db.addRoute(R);
+        db.addBus(A);
+        db.addBus(B);
+        assertEquals(2, db.getAllBusses().size());
+
+        db.removeBus(A);
+        assertEquals(1, db.getAllBusses().size());
+        assertEquals(B, db.getAllBusses().get(0));
+    }
+
+    @Test
+    void remove_route() throws SQLException {
+        Route A = new Route(0, 0, "0");
+        Route B = new Route(1, 1, "1");
+
+        db.addRoute(A);
+        db.addRoute(B);
+        assertEquals(2, db.getAllRoutes().size());
+
+        db.removeRoute(A);
+        assertEquals(1, db.getAllRoutes().size());
+        assertEquals(B, db.getAllRoutes().get(0));
+    }
+
+    @Test
+    void remove_stop() throws SQLException {
+        Stop A = new Stop(0, "0", 0, 0, 0);
+        Stop B = new Stop(1, "1", 1, 1, 1);
+
+        db.addStop(A);
+        db.addStop(B);
+
+        Route R = new Route(0,0,"0");
+        db.addRoute(R);
+        db.extendRoute(R, A);
+        db.extendRoute(R, B);
+        assertEquals(2, db.getAllStops().size());
+        assertEquals(2, db.getAllStops(0).size());
+
+        db.removeStop(A);
+        assertEquals(1, db.getAllStops().size());
+        assertEquals(1, db.getAllStops(0).size());
+
+        assertEquals(B, db.getAllStops().get(0));
+    }
+
+    @Test
+    void remove_event() throws SQLException {
+        Event A = new Event(0,0, EventType.move_bus);
+        Event B = new Event(1,1, EventType.move_bus);
+
+        db.addEvent(A);
+        db.addEvent(B);
+        assertEquals(2, db.getAllEvents().size());
+
+        db.removeEvent(A);
+        assertEquals(1, db.getAllEvents().size());
+        assertEquals(B, db.getAllEvents().get(0));
     }
 }
