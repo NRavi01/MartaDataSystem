@@ -24,6 +24,8 @@ public interface Database {
 
     void updateBus(Bus bus) throws SQLException;
 
+    void updateRoute(Route route) throws SQLException;
+
     void extendRoute(Route route, Stop stop) throws SQLException;
 
     void updateStop(Stop stop) throws SQLException;

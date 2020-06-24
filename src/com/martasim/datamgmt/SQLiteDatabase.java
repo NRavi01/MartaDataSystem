@@ -81,6 +81,12 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public void updateRoute(Route route) throws SQLException {
+        executeUpdate((String.format("UPDATE route SET number='%s', name='%s' WHERE id=%d",
+                route.getNumber(), route.getName(), route.getId())));
+    }
+
+    @Override
     public void extendRoute(Route route, Stop stop) throws SQLException {
         executeUpdate(String.format("INSERT INTO routeToStop values (%d, %d, %d)", route.getId(), stop.getId(), route.getStops().size()));
         route.extend(stop);
