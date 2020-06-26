@@ -92,7 +92,7 @@ class SQLiteDatabaseTest {
         List<Event> events = db.getAllEvents();
         assertEquals(0, events.size());
 
-        Event event = new Event (0, "not important" , 0);
+        Event event = new Event (0, 0 , EventType.move_bus);
 
         db.addEvent(event);
 
