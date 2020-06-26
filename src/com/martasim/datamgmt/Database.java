@@ -14,12 +14,36 @@ public interface Database {
 
     void close() throws SQLException;
 
+    /**
+     * Adds a bus to the database.
+     *
+     * @param bus that is to be added to the database
+     * @throws SQLException
+     */
     void addBus(Bus bus) throws SQLException;
 
+    /**
+     * Adds an event to the database.
+     *
+     * @param event that is to be added to the database
+     * @throws SQLException
+     */
     void addEvent(Event event) throws SQLException;
 
+    /**
+     * Adds a route to the database.
+     *
+     * @param route that is to be added to the database
+     * @throws SQLException
+     */
     void addRoute(Route route) throws SQLException;
 
+    /**
+     * Adds a stop to the database.
+     *
+     * @param stop that is to be added to the database
+     * @throws SQLException
+     */
     void addStop(Stop stop) throws SQLException;
 
     void updateBus(Bus bus) throws SQLException;
