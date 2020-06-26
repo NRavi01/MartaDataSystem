@@ -22,12 +22,33 @@ public interface Database {
 
     void addStop(Stop stop) throws SQLException;
 
+    /**
+     *
+     * @param bus Bus object that is updated to database
+     * @throws SQLException
+     */
     void updateBus(Bus bus) throws SQLException;
 
+    /**
+     *
+     * @param route Route object that is updated to database
+     * @throws SQLException
+     */
     void updateRoute(Route route) throws SQLException;
 
+    /**
+     *
+     * @param route Route object that is getting a stop added to the end of its list of stops
+     * @param stop Stop object that is getting added to the end of the route input
+     * @throws SQLException
+     */
     void extendRoute(Route route, Stop stop) throws SQLException;
 
+    /**
+     *
+     * @param stop Stop object that is updated to database
+     * @throws SQLException
+     */
     void updateStop(Stop stop) throws SQLException;
 
     Bus getBus(int id) throws SQLException;
