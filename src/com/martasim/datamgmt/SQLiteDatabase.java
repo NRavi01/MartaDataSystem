@@ -115,6 +115,15 @@ public class SQLiteDatabase implements Database {
         );
     }
 
+    Event getEvent(int id) throws SQLException {
+        Event event = null;
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE id=" + id);
+        if (resultSet.next()) {
+            event = getEvent(resultSet);
+        }
+        return event;
+    }
+
     private Event getEvent(ResultSet resultSet) throws SQLException {
         return new Event(
                 resultSet.getInt("id"), resultSet.getInt("time"),
