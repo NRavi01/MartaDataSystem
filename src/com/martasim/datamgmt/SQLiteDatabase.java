@@ -99,6 +99,11 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public void updateEvent(Event event) throws SQLException {
+        executeUpdate((String.format("UPDATE event SET time='%d", event.getTime())));
+    }
+
+    @Override
     public Bus getBus(int id) throws SQLException {
         Bus bus = null;
         ResultSet resultSet = executeQuery("SELECT * FROM bus WHERE id=" + id);

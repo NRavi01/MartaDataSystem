@@ -92,10 +92,7 @@ class SQLiteDatabaseTest {
         db.extendRoute(routeA, stopA);
         int numStopsInRoute = db.getRoute(routeA.getId()).getStops().size();
         assertEquals(1, numStopsInRoute);
-
-        if (numStopsInRoute > 0) {
-            assertEquals(stopA, db.getRoute(routeA.getId()).getStops().get(numStopsInRoute-1));
-        }
+        assertEquals(stopA, db.getRoute(routeA.getId()).getStops().get(numStopsInRoute-1));
     }
 
     @Test
@@ -109,6 +106,14 @@ class SQLiteDatabaseTest {
 
         db.updateStop(stopA);
         assertEquals(stopA, db.getStop(stopA.getId()));
+
+    }
+
+    @Test
+    void update_event() throws SQLException {
+        Event eventA = new Event(1, 1, EventType.move_bus);
+        db.addEvent(eventA);
+
 
     }
 

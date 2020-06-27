@@ -51,6 +51,13 @@ public interface Database {
      */
     void updateStop(Stop stop) throws SQLException;
 
+    /**
+     *
+     * @param event Event object that is updated to database
+     * @throws SQLException
+     */
+    void updateEvent(Event event) throws SQLException;
+
     Bus getBus(int id) throws SQLException;
 
     Route getRoute(int id) throws SQLException;
