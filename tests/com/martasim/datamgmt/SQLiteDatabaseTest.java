@@ -38,17 +38,6 @@ class SQLiteDatabaseTest {
 
         assertEquals(1, routes.size());
         assertEquals(route, routes.get(0));
-
-        Stop stop = new Stop(0, "stop 0", 0, 0, 0);
-        List <Stop> stops = new ArrayList<>();
-        stops.add(stop);
-        Route route2 = new Route(1, 1, "route 1", stops);
-        db.addRoute(route2);
-
-        routes = db.getAllRoutes();
-
-        assertEquals(2, routes.size());
-        assertEquals(route2, routes.get(1));
     }
 
     @Test
@@ -66,11 +55,16 @@ class SQLiteDatabaseTest {
         assertEquals(1, busses.size());
         assertEquals(bus1, busses.get(0));
 
+        db.removeBus(bus1);
+        busses = db.getAllBusses();
+        assertEquals(0, busses.size());
+
+        db.addRoute(route);
         db.addBus(bus2);
         busses = db.getAllBusses();
 
-        assertEquals(2, busses.size());
-        assertEquals(bus2, busses.get(1));
+        assertEquals(1, busses.size());
+        assertEquals(bus2, busses.get(0));
     }
 
     @Test
