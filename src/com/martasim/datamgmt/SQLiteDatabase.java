@@ -100,7 +100,7 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateEvent(Event event) throws SQLException {
-        executeUpdate((String.format("UPDATE event SET time='%d", event.getTime())));
+        executeUpdate((String.format("UPDATE event SET time=%d", event.getTime())));
     }
 
     @Override

@@ -116,6 +116,14 @@ class SQLiteDatabaseTest {
         Event eventA = new Event(1, 1, EventType.move_bus);
         db.addEvent(eventA);
 
+        assertEquals(eventA, db.getEvent(eventA.getId()));
+
+        eventA.setTime(10);
+        assertNotEquals(eventA, db.getEvent(eventA.getId()));
+
+        db.updateEvent(eventA);
+        assertEquals(eventA, db.getEvent(eventA.getId()));
+
 
     }
 
