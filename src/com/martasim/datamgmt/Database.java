@@ -22,21 +22,21 @@ public interface Database {
 
     void addStop(Stop stop) throws SQLException;
 
-    /**
+    /** Updates the route, location, passengers, passenger capacity, fuel, fuel capacity, and/or speed of a bus.
      *
      * @param bus Bus object that is updated to database
      * @throws SQLException
      */
     void updateBus(Bus bus) throws SQLException;
 
-    /**
+    /** Updates the name or number of a route. To add to a route's list of stops, use the extendRoute function instead.
      *
      * @param route Route object that is updated to database
      * @throws SQLException
      */
     void updateRoute(Route route) throws SQLException;
 
-    /**
+    /** Adds a stop to only the end of a route's list of stops
      *
      * @param route Route object that is getting a stop added to the end of its list of stops
      * @param stop Stop object that is getting added to the end of the route input
@@ -44,14 +44,15 @@ public interface Database {
      */
     void extendRoute(Route route, Stop stop) throws SQLException;
 
-    /**
+    /** Updates name, # of riders, latitude, and/or longitude of a stop
+     *
      *
      * @param stop Stop object that is updated to database
      * @throws SQLException
      */
     void updateStop(Stop stop) throws SQLException;
 
-    /**
+    /** Updates only the time of event
      *
      * @param event Event object that is updated to database
      * @throws SQLException
