@@ -4,6 +4,7 @@ import com.martasim.models.Bus;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 public class Main {
@@ -13,9 +14,9 @@ public class Main {
         }
         Database db = DatabaseFactory.createDatabaseFromGtfs(new File(args[0]));
 
-        List<Bus> busses = db.getAllBusses();
-        System.out.printf("There are %d busses\n", busses.size());
-        for (Bus bus : busses) {
+        Collection<Bus> buses = db.getAllBuses();
+        System.out.printf("There are %d buses\n", buses.size());
+        for (Bus bus : buses) {
             System.out.println(bus);
         }
     }

@@ -6,6 +6,7 @@ import com.martasim.models.Route;
 import com.martasim.models.Stop;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 public interface Database {
@@ -28,21 +29,27 @@ public interface Database {
 
     void updateStop(Stop stop) throws SQLException;
 
+    Event getEvent(int id) throws SQLException;
+
     Bus getBus(int id) throws SQLException;
 
     Route getRoute(int id) throws SQLException;
 
     Stop getStop(int id) throws SQLException;
 
-    List<Bus> getAllBusses() throws SQLException;
+    Collection<Bus> getAllBuses() throws SQLException;
 
-    List<Event> getAllEvents() throws SQLException;
+    //List<Bus> getAllBuses(int routeId) throws SQLException;
 
-    List<Route> getAllRoutes() throws SQLException;
+    //List<Event> getAllEvents(int time) throws SQLException;
 
-    List<Stop> getAllStops() throws SQLException;
+    Collection<Event> getAllEvents() throws SQLException;
 
-    List<Stop> getAllStops(int routeId) throws SQLException;
+    Collection<Route> getAllRoutes() throws SQLException;
+
+    Collection<Stop> getAllStops() throws SQLException;
+
+    Collection<Stop> getAllStops(int routeId) throws SQLException;
 
     /**
      * Removes a bus from the database.
