@@ -173,6 +173,25 @@ class SQLiteDatabaseTest {
     }
 
     @Test
+    void read_all_buses_routeid() throws SQLException {
+        Route A = new Route(0, 0, "0");
+        Route B = new Route(1, 1, "1");
+        Bus X = new Bus(0, A, 0, 0, 0, 0, 0, 0);
+        Bus Y = new Bus(1, B, 1, 5, 5, 0, 0, 0);
+        Bus Z = new Bus(2, B, 2, 10, 10, 0, 0, 0);
+        Collection<Bus> buses = new HashSet<>(Arrays.asList(Y, Z));
+
+        db.addRoute(A);
+        db.addRoute(B);
+        db.addBus(X);
+        db.addBus(Y);
+        db.addBus(Z);
+        assertEquals(3, db.getAllBuses().size());
+
+        assertEquals(buses, new HashSet<>(db.getAllBuses(1)));
+    }
+
+    @Test
     void read_all_routes() throws SQLException {
         Route A = new Route(0, 0, "0");
         Route B = new Route(1, 1, "1");
@@ -216,5 +235,21 @@ class SQLiteDatabaseTest {
         assertEquals(3, db.getAllEvents().size());
 
         assertEquals(events, new HashSet<>(db.getAllEvents()));
+    }
+
+    @Test
+    void read_all_events_time() throws SQLException {
+        Event A = new Event(0, 0, EventType.move_bus);
+        Event B = new Event(1, 5, EventType.move_bus);
+        Event C = new Event(2, 5, EventType.move_bus);
+        Collection<Event> events = new HashSet<>(Arrays.asList(B, C));
+
+
+        db.addEvent(A);
+        db.addEvent(B);
+        db.addEvent(C);
+        assertEquals(3, db.getAllEvents().size());
+
+        assertEquals(events, new HashSet<>(db.getAllEvents(5)));
     }
 }

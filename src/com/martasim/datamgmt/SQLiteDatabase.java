@@ -192,6 +192,41 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public List<Bus> getAllBuses(int routeId) throws SQLException {
+        List<Bus> buses = new ArrayList<>();
+        ResultSet rs = executeQuery("SELECT * FROM bus");
+        while (rs.next()) {
+            Bus new_bus = new Bus(
+                    rs.getInt("id"),
+                    getRoute(rs.getInt("route")),
+                    rs.getInt("location"),
+                    rs.getInt("passengers"),
+                    rs.getInt("passengerCapacity"),
+                    rs.getDouble("fuel"),
+                    rs.getDouble("fuelCapacity"),
+                    rs.getDouble("speed")
+            );
+            if (new_bus.getRoute().getId() == routeId) {
+                buses.add(new_bus);
+            }
+        }
+        return buses;
+    }
+
+    @Override
+    public List<Event> getAllEvents(int time) throws SQLException {
+        List<Event> events = new ArrayList<>();
+        ResultSet resultSet = executeQuery("SELECT * FROM event");
+        while (resultSet.next()) {
+            Event event = getEvent(resultSet);
+            if (event.getTime() == time) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    @Override
     public Collection<Event> getAllEvents() throws SQLException {
         List<Event> events = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM event");
