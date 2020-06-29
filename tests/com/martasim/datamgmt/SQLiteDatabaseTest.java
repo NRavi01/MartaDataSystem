@@ -74,7 +74,7 @@ class SQLiteDatabaseTest {
 
         db.removeRoute(A);
         assertEquals(1, db.getAllRoutes().size());
-        assertEquals(true, db.getAllRoutes().contains(B));
+        assertEquals(false, db.getAllRoutes().contains(A));
     }
 
     @Test
@@ -96,7 +96,7 @@ class SQLiteDatabaseTest {
         assertEquals(1, db.getAllStops().size());
         assertEquals(1, db.getAllStops(0).size());
 
-        assertEquals(true, db.getAllStops().contains(B));
+        assertEquals(false, db.getAllStops().contains(A));
     }
 
     @Test
@@ -110,7 +110,7 @@ class SQLiteDatabaseTest {
 
         db.removeEvent(A);
         assertEquals(1, db.getAllEvents().size());
-        assertEquals(true, db.getAllEvents().contains(B));
+        assertEquals(false, db.getAllEvents().contains(A));
     }
 
     @Test
