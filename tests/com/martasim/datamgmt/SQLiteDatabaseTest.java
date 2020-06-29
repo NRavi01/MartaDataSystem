@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -41,6 +42,63 @@ class SQLiteDatabaseTest {
 
         assertEquals(1, routes.size());
         assertEquals(route, routes.get(0));
+    }
+
+    @Test
+    void add_bus() throws SQLException {
+        List<Bus> busses = db.getAllBusses();
+        assertEquals(0, busses.size());
+
+        Route route = new Route(0, 0, "route 0");
+        Bus bus1 = new Bus(0, null, 0, 0 , 10 , 0, 10, 0);
+        Bus bus2 = new Bus(1, route, 1, 1 , 11 , 1, 11, 1);
+        db.addBus(bus1);
+
+        busses = db.getAllBusses();
+
+        assertEquals(1, busses.size());
+        assertEquals(bus1, busses.get(0));
+
+        db.removeBus(bus1);
+        busses = db.getAllBusses();
+        assertEquals(0, busses.size());
+
+        db.addRoute(route);
+        db.addBus(bus2);
+        busses = db.getAllBusses();
+
+        assertEquals(1, busses.size());
+        assertEquals(bus2, busses.get(0));
+    }
+
+    @Test
+    void add_stop() throws SQLException {
+        List<Stop> stops = db.getAllStops();
+        assertEquals(0, stops.size());
+
+        Stop stop = new Stop (0, "stop 0", 0, 0, 0);
+
+        db.addStop(stop);
+
+        stops = db.getAllStops();
+
+        assertEquals(1, stops.size());
+        assertEquals(stop, stops.get(0));
+    }
+
+    @Test
+    void add_event() throws SQLException {
+        List<Event> events = db.getAllEvents();
+        assertEquals(0, events.size());
+
+        Event event = new Event (0, 0 , EventType.move_bus);
+
+        db.addEvent(event);
+
+        events = db.getAllEvents();
+
+        assertEquals(1, events.size());
+        assertEquals(event, events.get(0));
     }
 
     @Test
