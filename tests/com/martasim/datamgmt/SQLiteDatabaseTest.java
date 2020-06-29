@@ -45,9 +45,7 @@ class SQLiteDatabaseTest {
         List<Bus> busses = db.getAllBusses();
         assertEquals(0, busses.size());
 
-        Route route = new Route(0, 0, "route 0");
         Bus bus1 = new Bus(0, null, 0, 0 , 10 , 0, 10, 0);
-        Bus bus2 = new Bus(1, route, 1, 1 , 11 , 1, 11, 1);
         db.addBus(bus1);
 
         busses = db.getAllBusses();
@@ -59,6 +57,9 @@ class SQLiteDatabaseTest {
         busses = db.getAllBusses();
         assertEquals(0, busses.size());
 
+
+        Route route = new Route(0, 0, "route 0");
+        Bus bus2 = new Bus(1, route, 1, 1 , 11 , 1, 11, 1);
         db.addRoute(route);
         db.addBus(bus2);
         busses = db.getAllBusses();
