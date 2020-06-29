@@ -194,9 +194,9 @@ public class SQLiteDatabase implements Database {
     @Override
     public List<Bus> getAllBuses(int routeId) throws SQLException {
         List<Bus> buses = new ArrayList<>();
-        ResultSet rs = executeQuery("SELECT * FROM bus");
+        ResultSet rs = executeQuery("SELECT * FROM bus WHERE route=" + routeId);
         while (rs.next()) {
-            Bus new_bus = new Bus(
+            buses.add(new Bus(
                     rs.getInt("id"),
                     getRoute(rs.getInt("route")),
                     rs.getInt("location"),
@@ -205,23 +205,17 @@ public class SQLiteDatabase implements Database {
                     rs.getDouble("fuel"),
                     rs.getDouble("fuelCapacity"),
                     rs.getDouble("speed")
-            );
-            if (new_bus.getRoute().getId() == routeId) {
-                buses.add(new_bus);
-            }
+            ));
         }
         return buses;
     }
 
     @Override
-    public List<Event> getAllEvents(int time) throws SQLException {
+    public Collection<Event> getAllEvents(int time) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event");
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE time=" + time);
         while (resultSet.next()) {
-            Event event = getEvent(resultSet);
-            if (event.getTime() == time) {
-                events.add(event);
-            }
+            events.add(getEvent(resultSet));
         }
         return events;
     }
@@ -259,7 +253,6 @@ public class SQLiteDatabase implements Database {
     @Override
     public List<Stop> getAllStops(int routeId) throws SQLException {
         List<Stop> stops = new ArrayList<>();
-        //orderby stopIndex
         ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId + " ORDER BY stopIndex");
         while (resultSet.next()) {
             stops.add(getStop(resultSet.getInt("stopId")));

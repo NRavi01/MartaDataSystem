@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SQLiteDatabaseTest {
 
@@ -36,7 +37,7 @@ class SQLiteDatabaseTest {
         routes = db.getAllRoutes();
 
         assertEquals(1, routes.size());
-        assertEquals(true, routes.contains(route));
+        assertTrue(routes.contains(route));
     }
 
     @Test

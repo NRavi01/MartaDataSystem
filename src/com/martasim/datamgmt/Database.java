@@ -39,9 +39,9 @@ public interface Database {
 
     Collection<Bus> getAllBuses() throws SQLException;
 
-    List<Bus> getAllBuses(int routeId) throws SQLException;
+    Collection<Bus> getAllBuses(int routeId) throws SQLException;
 
-    List<Event> getAllEvents(int time) throws SQLException;
+    Collection<Event> getAllEvents(int time) throws SQLException;
 
     Collection<Event> getAllEvents() throws SQLException;
 
