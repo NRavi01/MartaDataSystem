@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,6 +39,64 @@ class SQLiteDatabaseTest {
 
         assertEquals(1, routes.size());
         assertTrue(routes.contains(route));
+    }
+
+    @Test
+    void add_bus() throws SQLException {
+        Collection<Bus> buses = db.getAllBuses();
+        assertEquals(0, buses.size());
+
+        Bus bus1 = new Bus(0, null, 0, 0 , 10 , 0, 10, 0);
+        db.addBus(bus1);
+
+        buses = db.getAllBuses();
+
+        assertEquals(1, buses.size());
+        assertTrue(buses.contains(bus1));
+
+        db.removeBus(bus1);
+        buses = db.getAllBuses();
+        assertEquals(0, buses.size());
+
+
+        Route route = new Route(0, 0, "route 0");
+        Bus bus2 = new Bus(1, route, 1, 1 , 11 , 1, 11, 1);
+        db.addRoute(route);
+        db.addBus(bus2);
+        buses = db.getAllBuses();
+
+        assertEquals(1, buses.size());
+        assertTrue(buses.contains(bus2));
+    }
+
+    @Test
+    void add_stop() throws SQLException {
+        Collection<Stop> stops = db.getAllStops();
+        assertEquals(0, stops.size());
+
+        Stop stop = new Stop (0, "stop 0", 0, 0, 0);
+
+        db.addStop(stop);
+
+        stops = db.getAllStops();
+
+        assertEquals(1, stops.size());
+        assertTrue(stops.contains(stop));
+    }
+
+    @Test
+    void add_event() throws SQLException {
+        Collection<Event> events = db.getAllEvents();
+        assertEquals(0, events.size());
+
+        Event event = new Event (0, 0 , EventType.move_bus);
+
+        db.addEvent(event);
+
+        events = db.getAllEvents();
+
+        assertEquals(1, events.size());
+        assertTrue(events.contains(event));
     }
 
     @Test
