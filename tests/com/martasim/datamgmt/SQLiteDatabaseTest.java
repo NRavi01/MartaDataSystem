@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SQLiteDatabaseTest {
@@ -106,6 +108,83 @@ class SQLiteDatabaseTest {
 
         assertEquals(route, db.getRoute(1));
     }
+
+    @Test
+    void update_bus() throws SQLException {
+        Route routeA = new Route(1, 1, "Route 1");
+        db.addRoute(routeA);
+        Bus busA = new Bus(0, routeA, 1, 2, 10, 10, 20, 40);
+
+        db.addBus(busA);
+        assertEquals(busA, db.getBus(busA.getId()));
+
+        busA.setFuel(5);
+        busA.setPassengers(5);
+        assertNotEquals(busA, db.getBus(busA.getId()));
+
+        db.updateBus(busA);
+        assertEquals(busA, db.getBus(busA.getId()));
+    }
+
+    @Test
+    void update_route() throws SQLException {
+        Route routeA = new Route(1, 1, "Route 1");
+        db.addRoute(routeA);
+        assertEquals(routeA, db.getRoute(routeA.getId()));
+
+        routeA.setNumber(2);
+        routeA.setName("Route 2");
+        assertNotEquals(routeA, db.getRoute(routeA.getId()));
+
+        db.updateRoute(routeA);
+        assertEquals(routeA, db.getRoute(routeA.getId()));
+    }
+
+    @Test
+    void extend_route() throws SQLException {
+        Route routeA = new Route(1, 1,"Route 1");
+        db.addRoute(routeA);
+        assertEquals(0, db.getRoute(routeA.getId()).getStops().size());
+
+        Stop stopA = new Stop(1, "Stop 1", 2, 10, 10);
+        db.addStop(stopA);
+
+        db.extendRoute(routeA, stopA);
+        int numStopsInRoute = db.getRoute(routeA.getId()).getStops().size();
+        assertEquals(1, numStopsInRoute);
+        assertEquals(stopA, db.getRoute(routeA.getId()).getStops().get(numStopsInRoute-1));
+    }
+
+    @Test
+    void update_stop() throws SQLException {
+        Stop stopA = new Stop(1, "Stop 1", 3, 10, 10);
+        db.addStop(stopA);
+        assertEquals(stopA, db.getStop(stopA.getId()));
+
+        stopA.setRiders(5);
+        assertNotEquals(stopA, db.getStop(stopA.getId()));
+
+        db.updateStop(stopA);
+        assertEquals(stopA, db.getStop(stopA.getId()));
+
+    }
+
+    @Test
+    void update_event() throws SQLException {
+        Event eventA = new Event(1, 1, EventType.move_bus);
+        db.addEvent(eventA);
+
+        assertEquals(eventA, db.getEvent(eventA.getId()));
+
+        eventA.setTime(10);
+        assertNotEquals(eventA, db.getEvent(eventA.getId()));
+
+        db.updateEvent(eventA);
+        assertEquals(eventA, db.getEvent(eventA.getId()));
+
+
+    }
+
 
     @Test
     void remove_bus() throws SQLException {

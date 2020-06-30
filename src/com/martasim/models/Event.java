@@ -26,6 +26,8 @@ public class Event {
         return time;
     }
 
+    public void setTime(int time) { this.time = time; }
+
     public EventType getType() {
         return type;
     }
@@ -33,6 +35,8 @@ public class Event {
     public int getId() {
         return id;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

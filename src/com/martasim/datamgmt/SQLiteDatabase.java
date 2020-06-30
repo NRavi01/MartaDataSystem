@@ -82,6 +82,12 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public void updateRoute(Route route) throws SQLException {
+        executeUpdate((String.format("UPDATE route SET number='%s', name='%s' WHERE id=%d",
+                route.getNumber(), route.getName(), route.getId())));
+    }
+
+    @Override
     public void extendRoute(Route route, Stop stop) throws SQLException {
         executeUpdate(String.format("INSERT INTO routeToStop values (%d, %d, %d)", route.getId(), stop.getId(), route.getStops().size()));
         route.extend(stop);
@@ -91,6 +97,11 @@ public class SQLiteDatabase implements Database {
     public void updateStop(Stop stop) throws SQLException {
         executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%d",
                 stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
+    }
+
+    @Override
+    public void updateEvent(Event event) throws SQLException {
+        executeUpdate((String.format("UPDATE event SET time=%d", event.getTime())));
     }
 
     @Override
