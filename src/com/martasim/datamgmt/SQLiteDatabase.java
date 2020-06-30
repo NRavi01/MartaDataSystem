@@ -223,7 +223,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public List<Stop> getAllStops() throws SQLException {
+    public Collection<Stop> getAllStops() throws SQLException {
         List<Stop> stops = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM stop");
         while (resultSet.next()) {

@@ -110,10 +110,10 @@ public interface Database {
     /**
      * Gets all Stops from the database
      *
-     * @return List of type Stop containing all stops in database
+     * @return Collection of type Stop containing all stops in database
      * @throws SQLException
      */
-    List<Stop> getAllStops() throws SQLException;
+    Collection<Stop> getAllStops() throws SQLException;
 
     /**
      * Gets all stops from the database that are on a route with the corresponding route ID.
