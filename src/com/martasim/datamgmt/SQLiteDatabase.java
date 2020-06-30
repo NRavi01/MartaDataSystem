@@ -194,7 +194,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public List<Bus> getAllBuses(int routeId) throws SQLException {
+    public Collection<Bus> getAllBuses(int routeId) throws SQLException {
         List<Bus> buses = new ArrayList<>();
         ResultSet rs = executeQuery("SELECT * FROM bus WHERE route=" + routeId);
         while (rs.next()) {
