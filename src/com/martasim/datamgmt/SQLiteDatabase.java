@@ -177,16 +177,7 @@ public class SQLiteDatabase implements Database {
         List<Bus> buses = new ArrayList<>();
         ResultSet rs = executeQuery("SELECT * FROM bus");
         while (rs.next()) {
-            buses.add(new Bus(
-                    rs.getInt("id"),
-                    getRoute(rs.getInt("route")),
-                    rs.getInt("location"),
-                    rs.getInt("passengers"),
-                    rs.getInt("passengerCapacity"),
-                    rs.getDouble("fuel"),
-                    rs.getDouble("fuelCapacity"),
-                    rs.getDouble("speed")
-            ));
+            buses.add(getBus(rs));
         }
         return buses;
     }
@@ -196,16 +187,7 @@ public class SQLiteDatabase implements Database {
         List<Bus> buses = new ArrayList<>();
         ResultSet rs = executeQuery("SELECT * FROM bus WHERE route=" + routeId);
         while (rs.next()) {
-            buses.add(new Bus(
-                    rs.getInt("id"),
-                    getRoute(rs.getInt("route")),
-                    rs.getInt("location"),
-                    rs.getInt("passengers"),
-                    rs.getInt("passengerCapacity"),
-                    rs.getDouble("fuel"),
-                    rs.getDouble("fuelCapacity"),
-                    rs.getDouble("speed")
-            ));
+            buses.add(getBus(rs));
         }
         return buses;
     }
