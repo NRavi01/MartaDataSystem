@@ -6,6 +6,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 
 public class SQLiteDatabase implements Database {
 
@@ -39,7 +40,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS route");
         executeUpdate("CREATE TABLE route (id INTEGER PRIMARY KEY, number INTEGER, name STRING)");
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
-        executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, routeIndex INTEGER)");
+        executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, stopIndex INTEGER)");
         executeUpdate("DROP TABLE IF EXISTS stop");
         executeUpdate("CREATE TABLE stop (id INTEGER PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
@@ -126,7 +127,8 @@ public class SQLiteDatabase implements Database {
         );
     }
 
-    Event getEvent(int id) throws SQLException {
+    @Override
+    public Event getEvent(int id) throws SQLException {
         Event event = null;
         ResultSet resultSet = executeQuery("SELECT * FROM event WHERE id=" + id);
         if (resultSet.next()) {
@@ -182,26 +184,37 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public List<Bus> getAllBusses() throws SQLException {
-        List<Bus> busses = new ArrayList<>();
+    public Collection<Bus> getAllBuses() throws SQLException {
+        List<Bus> buses = new ArrayList<>();
         ResultSet rs = executeQuery("SELECT * FROM bus");
         while (rs.next()) {
-            busses.add(new Bus(
-                    rs.getInt("id"),
-                    getRoute(rs.getInt("route")),
-                    rs.getInt("location"),
-                    rs.getInt("passengers"),
-                    rs.getInt("passengerCapacity"),
-                    rs.getDouble("fuel"),
-                    rs.getDouble("fuelCapacity"),
-                    rs.getDouble("speed")
-            ));
+            buses.add(getBus(rs));
         }
-        return busses;
+        return buses;
     }
 
     @Override
-    public List<Event> getAllEvents() throws SQLException {
+    public Collection<Bus> getAllBuses(int routeId) throws SQLException {
+        List<Bus> buses = new ArrayList<>();
+        ResultSet rs = executeQuery("SELECT * FROM bus WHERE route=" + routeId);
+        while (rs.next()) {
+            buses.add(getBus(rs));
+        }
+        return buses;
+    }
+
+    @Override
+    public Collection<Event> getAllEvents(int time) throws SQLException {
+        List<Event> events = new ArrayList<>();
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE time=" + time);
+        while (resultSet.next()) {
+            events.add(getEvent(resultSet));
+        }
+        return events;
+    }
+
+    @Override
+    public Collection<Event> getAllEvents() throws SQLException {
         List<Event> events = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM event");
         while (resultSet.next()) {
@@ -211,7 +224,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public List<Route> getAllRoutes() throws SQLException {
+    public Collection<Route> getAllRoutes() throws SQLException {
         List<Route> routes = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM route");
         while (resultSet.next()) {
@@ -221,7 +234,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public List<Stop> getAllStops() throws SQLException {
+    public Collection<Stop> getAllStops() throws SQLException {
         List<Stop> stops = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM stop");
         while (resultSet.next()) {
@@ -233,7 +246,7 @@ public class SQLiteDatabase implements Database {
     @Override
     public List<Stop> getAllStops(int routeId) throws SQLException {
         List<Stop> stops = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId);
+        ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId + " ORDER BY stopIndex");
         while (resultSet.next()) {
             stops.add(getStop(resultSet.getInt("stopId")));
         }
