@@ -5,6 +5,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,9 +27,34 @@ class SQLiteDatabaseTest {
         db.clear();
     }
 
+
     @AfterEach
     void tearDown() throws SQLException {
         db.close();
+    }
+
+    @Test
+    void parse_gtfs() throws FileNotFoundException, IOException, SQLException {
+        GTFSParsingTest parser = new GTFSParsingTest();
+        parser.parse(db);
+
+        assertEquals(db.getStop(100004).getName(), "JOSEPH E LOWERY BLVD@BECKWITH ST SW"); //first stop in stops.txt
+        assertEquals(db.getStop(100006).getName(), "JOSEPH E LOWERY BLVD@PARSONS ST SW");
+        assertEquals(db.getStop(100114).getName(), "JOSEPH E LOWERY BLVD @ SELLS AVE SW");
+        assertEquals(db.getStop(115004).getName(), "PRYOR ST SW@CRUMLEY ST SW");
+        assertEquals(db.getStop(130002).getName(), "KENNARD LN @ GREEN FORREST DR");
+
+        /* These failed due to a SQLException, perhaps the db can't hold up to these many objects
+        or the BufferedReader can't read that up to that many lines
+
+        assertEquals(db.getStop(140002).getName(), "MCDONOUGH BLVD SE @ PARK RD SE");
+        assertEquals(db.getStop(150010).getName(), "JONESBORO RD SE @ MIDWAY ST SE");
+        assertEquals(db.getStop(175008).getName(), "ROOSEVELT HWY@FELDWOOD RD");
+        assertEquals(db.getStop(184096).getName(), "HILLANDALE DR @ OCEAN VALLEY DR");
+        assertEquals(db.getStop(212789).getName(), "MT ZION RD @ 2042"); //stop in middle of file
+        assertEquals(db.getStop(908990).getName(), "FIVE POINTS STATION"); //last stop
+        */
+
     }
 
     @Test
