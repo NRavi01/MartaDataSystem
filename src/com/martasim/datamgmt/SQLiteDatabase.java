@@ -27,11 +27,14 @@ public class SQLiteDatabase implements Database {
     private void executeUpdate(String sql) throws SQLException {
         Statement statement = connection.createStatement();
         statement.executeUpdate(sql);
+        statement.closeOnCompletion();
     }
 
     private ResultSet executeQuery(String sql) throws SQLException {
         Statement statement = connection.createStatement();
-        return statement.executeQuery(sql);
+        ResultSet resultSet = statement.executeQuery(sql);
+        statement.closeOnCompletion();
+        return resultSet;
     }
 
     public void clear() throws SQLException {
