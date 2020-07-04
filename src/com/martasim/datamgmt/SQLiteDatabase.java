@@ -82,6 +82,11 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public void updateEvent(Event event) throws SQLException {
+        executeUpdate((String.format("UPDATE event SET time=%d", event.getTime())));
+    }
+
+    @Override
     public void updateRoute(Route route) throws SQLException {
         executeUpdate((String.format("UPDATE route SET number='%s', name='%s' WHERE id=%d",
                 route.getNumber(), route.getName(), route.getId())));
@@ -97,11 +102,6 @@ public class SQLiteDatabase implements Database {
     public void updateStop(Stop stop) throws SQLException {
         executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%d",
                 stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
-    }
-
-    @Override
-    public void updateEvent(Event event) throws SQLException {
-        executeUpdate((String.format("UPDATE event SET time=%d", event.getTime())));
     }
 
     @Override
@@ -204,9 +204,9 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEvents(int time) throws SQLException {
+    public Collection<Event> getAllEvents() throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE time=" + time);
+        ResultSet resultSet = executeQuery("SELECT * FROM event");
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -214,9 +214,9 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEvents() throws SQLException {
+    public Collection<Event> getAllEvents(int time) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event");
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE time=" + time);
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -259,19 +259,29 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public void removeEvent(Event event) throws SQLException {
+        executeUpdate("DELETE FROM event WHERE id=" + event.getId());
+    }
+
+    @Override
     public void removeRoute(Route route) throws SQLException {
         executeUpdate("DELETE FROM route WHERE id=" + route.getId());
         executeUpdate("DELETE FROM routeToStop WHERE routeId=" + route.getId());
     }
 
     @Override
-    public void removeStop(Stop stop) throws SQLException {
-        executeUpdate("DELETE FROM stop WHERE id=" + stop.getId());
-        executeUpdate("DELETE FROM routeToStop WHERE stopId=" + stop.getId());
+    public void removeFromRoute(Route route, Stop stop) throws SQLException {
+        // TODO
     }
 
     @Override
-    public void removeEvent(Event event) throws SQLException {
-        executeUpdate("DELETE FROM event WHERE id=" + event.getId());
+    public void removeFromRoute(int routeId, int stopId) throws SQLException {
+        // TODO
+    }
+
+    @Override
+    public void removeStop(Stop stop) throws SQLException {
+        executeUpdate("DELETE FROM stop WHERE id=" + stop.getId());
+        executeUpdate("DELETE FROM routeToStop WHERE stopId=" + stop.getId());
     }
 }
