@@ -21,7 +21,7 @@ class DatabaseFactoryTest {
         }
 
         assertTrue(deleted);
-        assertTrue(!file.exists());
+        assertFalse(file.exists());
 
         Database db = DatabaseFactory.createEmptyDatabase();
 
