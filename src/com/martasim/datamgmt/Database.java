@@ -47,14 +47,24 @@ public interface Database {
      */
     void addStop(Stop stop) throws SQLException;
 
-    /** Updates the route, location, passengers, passenger capacity, fuel, fuel capacity, and/or speed of a bus.
+    /**
+     * Updates the route, location, passengers, passenger capacity, fuel, fuel capacity, and/or speed of a bus.
      *
      * @param bus Bus object that is updated to database
      * @throws SQLException
      */
     void updateBus(Bus bus) throws SQLException;
 
-    /** Updates the name or number of a route. To add to a route's list of stops, use the extendRoute function instead.
+    /**
+     * Updates only the time of event
+     *
+     * @param event Event object that is updated to database
+     * @throws SQLException
+     */
+    void updateEvent(Event event) throws SQLException;
+
+    /**
+     * Updates the name or number of a route. To add to a route's list of stops, use the extendRoute function instead.
      *
      * @param route Route object that is updated to database
      * @throws SQLException
@@ -69,30 +79,13 @@ public interface Database {
      */
     void extendRoute(Route route, Stop stop) throws SQLException;
 
-    /** Updates name, # of riders, latitude, and/or longitude of a stop
-     *
+    /**
+     * Updates name, # of riders, latitude, and/or longitude of a stop
      *
      * @param stop Stop object that is updated to database
      * @throws SQLException
      */
     void updateStop(Stop stop) throws SQLException;
-
-
-    /** Updates only the time of event
-     *
-     * @param event Event object that is updated to database
-     * @throws SQLException
-     */
-    void updateEvent(Event event) throws SQLException;
-
-    /**
-     * Gets an Event from the database
-     *
-     * @param id of the event being retrieved from the database
-     * @return Event object with corresponding id
-     * @throws SQLException
-     */
-    Event getEvent(int id) throws SQLException;
 
     /**
      * Gets a Bus from the database
@@ -102,6 +95,15 @@ public interface Database {
      * @throws SQLException
      */
     Bus getBus(int id) throws SQLException;
+
+    /**
+     * Gets an Event from the database
+     *
+     * @param id of the event being retrieved from the database
+     * @return Event object with corresponding id
+     * @throws SQLException
+     */
+    Event getEvent(int id) throws SQLException;
 
     /**
      * Gets a Route from the database
@@ -139,6 +141,14 @@ public interface Database {
     Collection<Bus> getAllBuses(int routeId) throws SQLException;
 
     /**
+     * Gets all events from the database
+     *
+     * @return Collection of type Event containing all events in database
+     * @throws SQLException
+     */
+    Collection<Event> getAllEvents() throws SQLException;
+
+    /**
      * Gets all events from the database with the corresponding time
      *
      * @param time value that each event being pulled from the database will have
@@ -146,14 +156,6 @@ public interface Database {
      * @throws SQLException
      */
     Collection<Event> getAllEvents(int time) throws SQLException;
-
-    /**
-     * Gets all events from the database
-     *
-     * @return Collection of type Event containing all events in database
-     * @throws SQLException
-     */
-    Collection<Event> getAllEvents() throws SQLException;
 
     /**
      * Gets all routes from the database
@@ -190,6 +192,14 @@ public interface Database {
     void removeBus(Bus bus) throws SQLException;
 
     /**
+     * Removes an event from the database.
+     *
+     * @param event that is removed from the database
+     * @throws SQLException
+     */
+    void removeEvent(Event event) throws SQLException;
+
+    /**
      * Removes a route from the database.
      *
      * @param route that is removed from the database
@@ -198,18 +208,28 @@ public interface Database {
     void removeRoute(Route route) throws SQLException;
 
     /**
+     * Removes a stop from a given route
+     *
+     * @param route from which to remove the stop
+     * @param stop  to remove
+     * @throws SQLException
+     */
+    void removeFromRoute(Route route, Stop stop) throws SQLException;
+
+    /**
+     * Removes a stop from a given route
+     *
+     * @param routeId of route from which to remove the stop
+     * @param stopId  of stop to remove
+     * @throws SQLException
+     */
+    void removeFromRoute(int routeId, int stopId) throws SQLException;
+
+    /**
      * Removes a stop from the database.
      *
      * @param stop that is removed from the database
      * @throws SQLException
      */
     void removeStop(Stop stop) throws SQLException;
-
-    /**
-     * Removes an event from the database.
-     *
-     * @param event that is removed from the database
-     * @throws SQLException
-     */
-    void removeEvent(Event event) throws SQLException;
 }
