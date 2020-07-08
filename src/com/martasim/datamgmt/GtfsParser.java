@@ -1,12 +1,12 @@
 package com.martasim.datamgmt;
 
-import java.io.File;
+import java.util.zip.ZipFile;
 
 class GtfsParser extends Parser {
 
 
-    GtfsParser(Database database, File file) {
-        super(database, file);
+    GtfsParser(Database database, ZipFile zipFile) {
+        super(database, zipFile);
     }
 
     @Override
