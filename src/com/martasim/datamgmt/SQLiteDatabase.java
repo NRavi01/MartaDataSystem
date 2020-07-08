@@ -39,7 +39,7 @@ public class SQLiteDatabase implements Database {
 
     public void clear() throws SQLException {
         executeUpdate("DROP TABLE IF EXISTS bus");
-        executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route INTEGER, location INTEGER, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
+        executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route INTEGER, currentStop INTEGER, latitude REAL, longitude REAL, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
         executeUpdate("DROP TABLE IF EXISTS route");
         executeUpdate("CREATE TABLE route (id INTEGER PRIMARY KEY, number INTEGER, name STRING)");
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
@@ -79,8 +79,8 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateBus(Bus bus) throws SQLException {
-        executeUpdate(String.format("UPDATE bus SET route=%d, location=%d, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
-                 bus.getRoute().getId(), bus.getLocation(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
+        executeUpdate(String.format("UPDATE bus SET route=%d, currentStop=%d, latitude=%f, longitude=%f, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
+                 bus.getRoute().getId(), bus.getCurrentStopIndex(), bus.getLatitude(), bus.getLongitude(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
         ));
     }
 
@@ -121,7 +121,9 @@ public class SQLiteDatabase implements Database {
         return new Bus(
                 resultSet.getInt("id"),
                 getRoute(resultSet.getInt("route")),
-                resultSet.getInt("location"),
+                resultSet.getInt("currentStop"),
+                resultSet.getDouble("latitude"),
+                resultSet.getDouble("longitude"),
                 resultSet.getInt("passengers"),
                 resultSet.getInt("passengerCapacity"),
                 resultSet.getDouble("fuel"),
