@@ -47,7 +47,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS stop");
         executeUpdate("CREATE TABLE stop (id INTEGER PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
-        executeUpdate("CREATE TABLE event (id INTEGER PRIMARY KEY, time INTEGER, type STRING NOT NULL)");
+        executeUpdate("CREATE TABLE event (id INTEGER, time INTEGER, type STRING NOT NULL)");
     }
 
     @Override
