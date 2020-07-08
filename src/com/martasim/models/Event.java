@@ -2,7 +2,7 @@ package com.martasim.models;
 
 import java.util.Objects;
 
-public class Event {
+public class Event implements Cloneable {
     int id;
     int time;
     EventType type;
@@ -26,7 +26,9 @@ public class Event {
         return time;
     }
 
-    public void setTime(int time) { this.time = time; }
+    public void setTime(int time) {
+        this.time = time;
+    }
 
     public EventType getType() {
         return type;
@@ -36,7 +38,10 @@ public class Event {
         return id;
     }
 
-
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     @Override
     public boolean equals(Object o) {

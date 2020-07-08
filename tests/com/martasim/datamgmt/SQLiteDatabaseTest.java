@@ -167,19 +167,17 @@ class SQLiteDatabaseTest {
     }
 
     @Test
-    void update_event() throws SQLException {
+    void update_event() throws SQLException, CloneNotSupportedException {
         Event eventA = new Event(1, 1, EventType.move_bus);
         db.addEvent(eventA);
 
-        assertEquals(eventA, db.getEvent(eventA.getId()));
-
-        eventA.setTime(10);
-        assertNotEquals(eventA, db.getEvent(eventA.getId()));
-
-        db.updateEvent(eventA);
-        assertEquals(eventA, db.getEvent(eventA.getId()));
+        Event eventB = (Event)eventA.clone();
+        eventB.setTime(10);
 
 
+        db.updateEvent(eventA, eventB);
+        assertEquals(1, db.getAllEvents().size());
+        assertTrue(db.getAllEvents().contains(eventB));
     }
 
 
@@ -276,15 +274,6 @@ class SQLiteDatabaseTest {
         db.addStop(S);
 
         assertEquals(S, db.getStop(S.getId()));
-    }
-
-    @Test
-    void read_event() throws SQLException {
-        Event E = new Event(0, 0, EventType.move_bus);
-
-        db.addEvent(E);
-
-        assertEquals(E, db.getEvent(E.getId()));
     }
 
     @Test
@@ -386,6 +375,6 @@ class SQLiteDatabaseTest {
         db.addEvent(C);
         assertEquals(3, db.getAllEvents().size());
 
-        assertEquals(events, new HashSet<>(db.getAllEvents(5)));
+        assertEquals(events, new HashSet<>(db.getAllEventsWithTime(5)));
     }
 }

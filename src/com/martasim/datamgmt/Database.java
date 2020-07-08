@@ -1,9 +1,6 @@
 package com.martasim.datamgmt;
 
-import com.martasim.models.Bus;
-import com.martasim.models.Event;
-import com.martasim.models.Route;
-import com.martasim.models.Stop;
+import com.martasim.models.*;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -58,10 +55,11 @@ public interface Database {
     /**
      * Updates only the time of event
      *
-     * @param event Event object that is updated to database
+     * @param oldEvent Event object that is currently in database
+     * @param newEvent Event object that is will replace oldEvent
      * @throws SQLException
      */
-    void updateEvent(Event event) throws SQLException;
+    void updateEvent(Event oldEvent, Event newEvent) throws SQLException;
 
     /**
      * Updates the name or number of a route. To add to a route's list of stops, use the extendRoute function instead.
@@ -95,15 +93,6 @@ public interface Database {
      * @throws SQLException
      */
     Bus getBus(int id) throws SQLException;
-
-    /**
-     * Gets an Event from the database
-     *
-     * @param id of the event being retrieved from the database
-     * @return Event object with corresponding id
-     * @throws SQLException
-     */
-    Event getEvent(int id) throws SQLException;
 
     /**
      * Gets a Route from the database
@@ -151,11 +140,30 @@ public interface Database {
     /**
      * Gets all events from the database with the corresponding time
      *
-     * @param time value that each event being pulled from the database will have
-     * @return Collection of type Event containing all events in database with the corresponding time value
+     * @param id of object that corresponds to the event
+     * @return Collection of Events with corresponding id
      * @throws SQLException
      */
-    Collection<Event> getAllEvents(int time) throws SQLException;
+    Collection<Event> getAllEventsWithId(int id) throws SQLException;
+
+    /**
+     * Gets all events from the database with the corresponding time
+     *
+     * @param time of event
+     * @return Collection of Events with corresponding time
+     * @throws SQLException
+     */
+    Collection<Event> getAllEventsWithTime(int time) throws SQLException;
+
+
+    /**
+     * Gets all events from the database with the corresponding time
+     *
+     * @param type of event
+     * @return Collection of Events with corresponding type
+     * @throws SQLException
+     */
+    Collection<Event> getAllEventsWithType(EventType type) throws SQLException;
 
     /**
      * Gets all routes from the database
