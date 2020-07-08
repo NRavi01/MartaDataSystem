@@ -47,7 +47,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS stop");
         executeUpdate("CREATE TABLE stop (id INTEGER PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
-        executeUpdate("CREATE TABLE event (id INTEGER PRIMARY KEY, time INTEGER, type STRING NOT NULL)");
+        executeUpdate("CREATE TABLE event (id INTEGER, time INTEGER, type STRING NOT NULL)");
     }
 
     @Override
@@ -85,8 +85,16 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public void updateEvent(Event event) throws SQLException {
-        executeUpdate((String.format("UPDATE event SET time=%d", event.getTime())));
+    public void updateEvent(Event oldEvent, Event newEvent) throws SQLException {
+        executeUpdate(String.format(
+                "UPDATE event SET id=%d, time=%d, type='%s' WHERE id=%d AND time=%d AND type='%s'",
+                newEvent.getId(),
+                newEvent.getTime(),
+                newEvent.getType().name(),
+                oldEvent.getId(),
+                oldEvent.getTime(),
+                oldEvent.getType().name()
+        ));
     }
 
     @Override
@@ -130,16 +138,6 @@ public class SQLiteDatabase implements Database {
                 resultSet.getDouble("fuelCapacity"),
                 resultSet.getDouble("speed")
         );
-    }
-
-    @Override
-    public Event getEvent(int id) throws SQLException {
-        Event event = null;
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE id=" + id);
-        if (resultSet.next()) {
-            event = getEvent(resultSet);
-        }
-        return event;
     }
 
     private Event getEvent(ResultSet resultSet) throws SQLException {
@@ -219,9 +217,29 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEvents(int time) throws SQLException {
+    public Collection<Event> getAllEventsWithId(int id) throws SQLException {
+        List<Event> events = new ArrayList<>();
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE id=" + id);
+        while (resultSet.next()) {
+            events.add(getEvent(resultSet));
+        }
+        return events;
+    }
+
+    @Override
+    public Collection<Event> getAllEventsWithTime(int time) throws SQLException {
         List<Event> events = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM event WHERE time=" + time);
+        while (resultSet.next()) {
+            events.add(getEvent(resultSet));
+        }
+        return events;
+    }
+
+    @Override
+    public Collection<Event> getAllEventsWithType(EventType type) throws SQLException {
+        List<Event> events = new ArrayList<>();
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE type='" + type.name() + '\'');
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
