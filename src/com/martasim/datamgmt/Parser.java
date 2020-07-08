@@ -1,14 +1,14 @@
 package com.martasim.datamgmt;
 
-import java.io.File;
+import java.util.zip.ZipFile;
 
 abstract class Parser {
     Database database;
-    File file;
+    ZipFile zipFile;
 
-    Parser(Database database, File file) {
+    Parser(Database database, ZipFile zipFile) {
         this.database = database;
-        this.file = file;
+        this.zipFile = zipFile;
     }
 
     abstract void parse();

@@ -8,8 +8,18 @@ import java.util.List;
 
 public interface Database {
 
+    /**
+     * Clears the database of all data.
+     * @throws SQLException
+     */
     void clear() throws SQLException;
 
+    /**
+     * Disconnects from the database.
+     * Make sure to call this once you are done with the database
+     * to make sure all changes and updates have been saved.
+     * @throws SQLException
+     */
     void close() throws SQLException;
 
     /**
