@@ -33,20 +33,17 @@ class GtfsParser extends Parser {
     private void addRoutes(InputStream inputStream) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-        //initialize hashmap with first column of file
+        //initialize hash map with the first row of the file
         HashMap<String, String> map = new HashMap<>();
         String labels[] = (br.readLine() + " ").split(",");
-        for (int i = 0; i < labels.length; i++) {
-            map.put(labels[i], "");
+        for (String label: labels) {
+            map.put(label, "");
         }
 
         String line;
         while ((line = br.readLine()) != null) {
             String st[] = (line + " ").split(",");
-            
-            // TODO: Use st.next() to keep getting the next value in the csv
-            // Parse integers with Integer.parseInt(next())
-            // Parse doubles with Double.parseDouble(next())
+
             try {
                 for (int i = 0; i < labels.length; i++) {
                     map.replace(labels[i], st[i]);
