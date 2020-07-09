@@ -5,8 +5,8 @@ import com.martasim.models.*;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 public class SQLiteDatabase implements Database {
 
@@ -269,7 +269,9 @@ public class SQLiteDatabase implements Database {
     @Override
     public List<Stop> getAllStops(int routeId) throws SQLException {
         List<Stop> stops = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId + " ORDER BY stopIndex");
+        ResultSet resultSet = executeQuery(
+                "SELECT stopId FROM routeToStop WHERE routeId=" + routeId + " ORDER BY stopIndex"
+        );
         while (resultSet.next()) {
             stops.add(getStop(resultSet.getInt("stopId")));
         }
@@ -294,17 +296,29 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void removeFromRoute(Route route, Stop stop) throws SQLException {
-        // TODO
+        route.getStops().remove(stop);
+        removeFromRoute(route.getId(), stop.getId());
     }
 
     @Override
     public void removeFromRoute(int routeId, int stopId) throws SQLException {
-        // TODO
+        executeUpdate(String.format("DELETE FROM routeToStop WHERE routeId=%d AND stopId=%d", routeId, stopId));
+        executeUpdate(String.format(
+                "UPDATE routeToStop SET stopIndex = stopIndex + 1 WHERE routeId=%d AND stopId>%d",
+                routeId,
+                stopId
+        ));
     }
 
     @Override
     public void removeStop(Stop stop) throws SQLException {
-        executeUpdate("DELETE FROM stop WHERE id=" + stop.getId());
-        executeUpdate("DELETE FROM routeToStop WHERE stopId=" + stop.getId());
+        removeStop(stop.getId());
+    }
+
+    @Override
+    public void removeStop(int stopId) throws SQLException {
+        executeUpdate(String.format("DELETE FROM routeToStop WHERE stopId=%d", stopId));
+        executeUpdate(String.format("UPDATE routeToStop SET stopIndex = stopIndex + 1 WHERE stopId>%d", stopId));
+        executeUpdate("DELETE FROM stop WHERE id=" + stopId);
     }
 }

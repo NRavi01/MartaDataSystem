@@ -250,4 +250,12 @@ public interface Database {
      * @throws SQLException
      */
     void removeStop(Stop stop) throws SQLException;
+
+    /**
+     * Removes a stop from the database.
+     *
+     * @param stopId of stop to remove from the database
+     * @throws SQLException
+     */
+    void removeStop(int stopId) throws SQLException;
 }

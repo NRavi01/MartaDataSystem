@@ -6,8 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -215,28 +216,37 @@ class SQLiteDatabaseTest {
     void remove_stop() throws SQLException {
         Stop A = new Stop(0, "0", 0, 0, 0);
         Stop B = new Stop(1, "1", 1, 1, 1);
+        Stop C = new Stop(2, "2", 2, 2, 2);
 
         db.addStop(A);
         db.addStop(B);
+        db.addStop(C);
 
-        Route R = new Route(0,0,"0");
+        Route R = new Route(0, 0, "0");
         db.addRoute(R);
         db.extendRoute(R, A);
         db.extendRoute(R, B);
-        assertEquals(2, db.getAllStops().size());
+        assertEquals(3, db.getAllStops().size());
         assertEquals(2, db.getAllStops(0).size());
 
         db.removeStop(A);
-        assertEquals(1, db.getAllStops().size());
-        assertEquals(1, db.getAllStops(0).size());
-
+        assertEquals(2, db.getAllStops().size());
         assertFalse(db.getAllStops().contains(A));
+
+        assertEquals(1, db.getAllStops(0).size());
+        assertTrue(db.getAllStops(0).contains(B));
+
+
+        db.extendRoute(R, C);
+        assertEquals(2, db.getAllStops(0).size());
+        assertEquals(B, db.getAllStops(0).get(0));
+        assertEquals(C, db.getAllStops(0).get(1));
     }
 
     @Test
     void remove_event() throws SQLException {
         Event A = new Event(0,0, EventType.move_bus);
-        Event B = new Event(1,1, EventType.move_bus);
+        Event B = new Event(1, 1, EventType.move_bus);
 
         db.addEvent(A);
         db.addEvent(B);
@@ -245,6 +255,32 @@ class SQLiteDatabaseTest {
         db.removeEvent(A);
         assertEquals(1, db.getAllEvents().size());
         assertFalse(db.getAllEvents().contains(A));
+    }
+
+    @Test
+    void remove_stop_from_route() throws SQLException {
+        Stop[] stops = {
+                new Stop(0, "0", 0, 0, 0),
+                new Stop(1, "1", 1, 1, 1)
+        };
+        Route route = new Route(0, 0, "0");
+
+        for (Stop stop : stops) {
+            db.addStop(stop);
+        }
+        db.addRoute(route);
+        db.extendRoute(route, stops[0]);
+        db.extendRoute(route, stops[1]);
+        assertEquals(2, db.getAllStops(route.getId()).size());
+
+        db.removeFromRoute(route, stops[0]);
+        assertEquals(1, db.getAllStops(route.getId()).size());
+        assertTrue(db.getAllStops(route.getId()).contains(stops[1]));
+        assertEquals(1, route.getStops().size());
+
+        db.extendRoute(route, stops[0]);
+        assertEquals(2, db.getAllStops(route.getId()).size());
+        assertEquals(2, route.getStops().size());
     }
 
     @Test
