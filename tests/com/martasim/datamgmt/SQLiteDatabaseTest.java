@@ -73,7 +73,7 @@ class SQLiteDatabaseTest {
         Collection<Stop> stops = db.getAllStops();
         assertEquals(0, stops.size());
 
-        Stop stop = new Stop (0, "stop 0", 0, 0, 0);
+        Stop stop = new Stop ("0", "stop 0", 0, 0, 0);
 
         db.addStop(stop);
 
@@ -143,7 +143,7 @@ class SQLiteDatabaseTest {
         db.addRoute(routeA);
         assertEquals(0, db.getRoute(routeA.getId()).getStops().size());
 
-        Stop stopA = new Stop(1, "Stop 1", 2, 10, 10);
+        Stop stopA = new Stop("1", "Stop 1", 2, 10, 10);
         db.addStop(stopA);
 
         db.extendRoute(routeA, stopA);
@@ -154,7 +154,7 @@ class SQLiteDatabaseTest {
 
     @Test
     void update_stop() throws SQLException {
-        Stop stopA = new Stop(1, "Stop 1", 3, 10, 10);
+        Stop stopA = new Stop("1", "Stop 1", 3, 10, 10);
         db.addStop(stopA);
         assertEquals(stopA, db.getStop(stopA.getId()));
 
@@ -213,8 +213,8 @@ class SQLiteDatabaseTest {
 
     @Test
     void remove_stop() throws SQLException {
-        Stop A = new Stop(0, "0", 0, 0, 0);
-        Stop B = new Stop(1, "1", 1, 1, 1);
+        Stop A = new Stop("0", "0", 0, 0, 0);
+        Stop B = new Stop("1", "1", 1, 1, 1);
 
         db.addStop(A);
         db.addStop(B);
@@ -269,7 +269,7 @@ class SQLiteDatabaseTest {
 
     @Test
     void read_stop() throws SQLException {
-        Stop S = new Stop(0, "Stop 0", 0, 0, 0);
+        Stop S = new Stop("0", "Stop 0", 0, 0, 0);
 
         db.addStop(S);
 
@@ -333,9 +333,9 @@ class SQLiteDatabaseTest {
 
     @Test
     void read_all_stops() throws SQLException {
-        Stop A = new Stop(0, "Stop 0", 0, 0, 0);
-        Stop B = new Stop(1, "Stop 1", 5, 0, 0);
-        Stop C = new Stop(2, "Stop 2", 10, 0, 0);
+        Stop A = new Stop("0", "Stop 0", 0, 0, 0);
+        Stop B = new Stop("1", "Stop 1", 5, 0, 0);
+        Stop C = new Stop("2", "Stop 2", 10, 0, 0);
         Collection<Stop> stops = new HashSet<>(Arrays.asList(A, B, C));
 
         db.addStop(A);

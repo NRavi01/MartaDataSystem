@@ -1,6 +1,8 @@
 package com.martasim.datamgmt;
 
 import com.martasim.models.Route;
+import com.martasim.models.Stop;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -10,18 +12,36 @@ import java.util.zip.ZipFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserTest {
-    @Test
-    void parse_route() throws SQLException, IOException {
-        Database db = DatabaseFactory.createEmptyDatabase();
+    static Database db;
+    static GtfsParser parser;
+
+    @BeforeAll
+    static void parse_data() throws SQLException, IOException {
+        db = DatabaseFactory.createEmptyDatabase();
 
         ZipFile zip = new ZipFile("/Users/wilwarner6/vcs/wwarner7/github.gatech.edu/MartaSimDataMgmt/src/com/martasim/data/gtfs022118.zip");
-        GtfsParser parser = new GtfsParser(db, zip);
+        parser = new GtfsParser(db, zip);
         parser.parse();
+    }
+
+    @Test
+    void parse_route() throws SQLException, IOException {
         Route route = new Route("7634", "1", "Centennial Oly. Park/Coronet Way");
         Route last_route = new Route("8747", "RED", "RED-North South North Springs Line");
 
         assertEquals(db.getRoute("7634"), route);
         assertEquals(db.getRoute("8747"), last_route);
 
+    }
+
+    @Test
+    void parse_stop() throws SQLException, IOException {
+        Stop stop = new Stop("100004", "JOSEPH E LOWERY BLVD@BECKWITH ST SW", 0, 33.752636, -84.417759);
+        Stop mid_stop = new Stop("900788", "FULTON INDUSTRIAL BLVD @ SELIG DR", 0, 33.747613, -84.554351);
+        Stop quote_stop = new Stop("213316", "PEACHTREE ST SW @ MARTIN L KING,JR DR", 0, 33.751957, -84.392124);
+
+        assertEquals(db.getStop("100004"), stop);
+        assertEquals(db.getStop("900788"), mid_stop);
+        assertEquals(db.getStop("213316"), quote_stop);
     }
 }

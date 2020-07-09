@@ -45,7 +45,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
         executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, stopIndex INTEGER)");
         executeUpdate("DROP TABLE IF EXISTS stop");
-        executeUpdate("CREATE TABLE stop (id INTEGER PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
+        executeUpdate("CREATE TABLE stop (id STRING PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
         executeUpdate("CREATE TABLE event (id INTEGER, time INTEGER, type STRING NOT NULL)");
     }
@@ -99,19 +99,19 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateRoute(Route route) throws SQLException {
-        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id=%d",
+        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id=%s",
                 route.getShortName(), route.getName(), route.getId())));
     }
 
     @Override
     public void extendRoute(Route route, Stop stop) throws SQLException {
-        executeUpdate(String.format("INSERT INTO routeToStop values (%d, %d, %d)", route.getId(), stop.getId(), route.getStops().size()));
+        executeUpdate(String.format("INSERT INTO routeToStop values (%s, %s, %d)", route.getId(), stop.getId(), route.getStops().size()));
         route.extend(stop);
     }
 
     @Override
     public void updateStop(Stop stop) throws SQLException {
-        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%d",
+        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%s",
                 stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
     }
 
@@ -167,7 +167,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Stop getStop(int id) throws SQLException {
+    public Stop getStop(String id) throws SQLException {
         Stop stop = null;
         ResultSet resultSet = executeQuery("SELECT * FROM stop WHERE id=" + id);
         if (resultSet.next()) {
@@ -178,7 +178,7 @@ public class SQLiteDatabase implements Database {
 
     private Stop getStop(ResultSet resultSet) throws SQLException {
         return new Stop (
-                resultSet.getInt("id"),
+                resultSet.getString("id"),
                 resultSet.getString("name"),
                 resultSet.getInt("riders"),
                 resultSet.getDouble("latitude"),
@@ -271,7 +271,7 @@ public class SQLiteDatabase implements Database {
         List<Stop> stops = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId + " ORDER BY stopIndex");
         while (resultSet.next()) {
-            stops.add(getStop(resultSet.getInt("stopId")));
+            stops.add(getStop(resultSet.getString("stopId")));
         }
         return stops;
     }

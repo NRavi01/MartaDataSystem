@@ -3,13 +3,13 @@ package com.martasim.models;
 import java.util.Objects;
 
 public class Stop {
-    final int id;
+    final String id;
     String name;
     int riders;
     double latitude;
     double longitude;
 
-    public Stop(int id, String name, int riders, double latitude, double longitude) {
+    public Stop(String id, String name, int riders, double latitude, double longitude) {
         this.id = id;
         this.name = name;
         this.riders = riders;
@@ -19,8 +19,8 @@ public class Stop {
 
     @Override
     public String toString() {
-        return "(" +
-                id + ", " +
+        return "(\'" +
+                id + "\', " +
                 '\'' + name + "', " +
                 riders + ", " +
                 latitude + ", " +
@@ -28,7 +28,7 @@ public class Stop {
                 ")";
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -69,7 +69,7 @@ public class Stop {
         if (this == o) return true;
         if (!(o instanceof Stop)) return false;
         Stop stop = (Stop) o;
-        return id == stop.id &&
+        return id.equals(stop.id) &&
                 riders == stop.riders &&
                 Double.compare(stop.latitude, latitude) == 0 &&
                 Double.compare(stop.longitude, longitude) == 0 &&

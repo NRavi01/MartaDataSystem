@@ -120,7 +120,7 @@ public interface Database {
      * @return Stop object with corresponding id
      * @throws SQLException
      */
-    Stop getStop(int id) throws SQLException;
+    Stop getStop(String id) throws SQLException;
 
     /**
      * Gets all buses from the database
