@@ -23,8 +23,8 @@ class BusTest {
     @Test
     void setCurrentStopIndex_too_large() {
         Route route = new Route(
-                0,
-                0,
+                "0",
+                "0",
                 "0",
                 Arrays.asList(
                         new Stop(0, "0", 0, 0, 0),
@@ -42,7 +42,7 @@ class BusTest {
 
         Stop firstStop = new Stop(0, "0", 0, 0, 0);
         Stop secondStop = new Stop(1, "1", 1, 1, 1);
-        Route route = new Route(0, 0, "0", Arrays.asList(firstStop, secondStop));
+        Route route = new Route("0", "0", "0", Arrays.asList(firstStop, secondStop));
 
         final Bus b = new Bus(1, route, 1, 1, 1, 1, 1, 1, 1);
         assertEquals(null, b.getCurrentStop());
@@ -66,7 +66,7 @@ class BusTest {
     void getNextStopIndex() {
         Stop firstStop = new Stop(0, "0", 0, 0, 0);
         Stop secondStop = new Stop(1, "1", 1, 1, 1);
-        Route route = new Route(0, 0, "0", Arrays.asList(firstStop, secondStop));
+        Route route = new Route("0", "0", "0", Arrays.asList(firstStop, secondStop));
 
         Bus bus = new Bus(0, route, 0, 0, 0, 0, 0, 0, 0);
         assertEquals(-1, bus.getNextStopIndex());
@@ -88,7 +88,7 @@ class BusTest {
     void getNextStop() {
         Stop firstStop = new Stop(0, "0", 0, 0, 0);
         Stop secondStop = new Stop(1, "1", 1, 1, 1);
-        Route route = new Route(0, 0, "0", Arrays.asList(firstStop, secondStop));
+        Route route = new Route("0", "0", "0", Arrays.asList(firstStop, secondStop));
 
         Bus bus = new Bus(0, route, 0, 0, 0, 0, 0, 0, 0);
         assertEquals(null, bus.getNextStop());
@@ -104,7 +104,7 @@ class BusTest {
     void goToNextStop() {
         Stop firstStop = new Stop(0, "0", 0, 0, 0);
         Stop secondStop = new Stop(1, "1", 1, 1, 1);
-        Route route = new Route(0, 0, "0", Arrays.asList(firstStop, secondStop));
+        Route route = new Route("0", "0", "0", Arrays.asList(firstStop, secondStop));
 
         Bus bus = new Bus(0, route, 0, 0, 0, 0, 0, 0, 0);
         assertEquals(-1, bus.getNextStopIndex());

@@ -41,7 +41,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS bus");
         executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route INTEGER, currentStop INTEGER, latitude REAL, longitude REAL, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
         executeUpdate("DROP TABLE IF EXISTS route");
-        executeUpdate("CREATE TABLE route (id INTEGER PRIMARY KEY, number INTEGER, name STRING)");
+        executeUpdate("CREATE TABLE route (id STRING PRIMARY KEY, shortName STRING, name STRING)");
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
         executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, stopIndex INTEGER)");
         executeUpdate("DROP TABLE IF EXISTS stop");
@@ -99,8 +99,8 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateRoute(Route route) throws SQLException {
-        executeUpdate((String.format("UPDATE route SET number='%s', name='%s' WHERE id=%d",
-                route.getNumber(), route.getName(), route.getId())));
+        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id=%d",
+                route.getShortName(), route.getName(), route.getId())));
     }
 
     @Override
@@ -128,7 +128,7 @@ public class SQLiteDatabase implements Database {
     private Bus getBus(ResultSet resultSet) throws SQLException {
         return new Bus(
                 resultSet.getInt("id"),
-                getRoute(resultSet.getInt("route")),
+                getRoute(resultSet.getString("route")),
                 resultSet.getInt("currentStop"),
                 resultSet.getDouble("latitude"),
                 resultSet.getDouble("longitude"),
@@ -148,7 +148,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Route getRoute(int id) throws SQLException {
+    public Route getRoute(String id) throws SQLException {
         Route route = null;
         ResultSet resultSet = executeQuery("SELECT * FROM route WHERE id=" + id);
         if (resultSet.next()) {
@@ -159,8 +159,8 @@ public class SQLiteDatabase implements Database {
 
     private Route getRoute(ResultSet resultSet) throws SQLException {
         return new Route(
-                resultSet.getInt("id"),
-                resultSet.getInt("number"),
+                resultSet.getString("id"),
+                resultSet.getString("shortName"),
                 resultSet.getString("name"),
                 getAllStops(resultSet.getInt("id"))
         );
@@ -197,7 +197,7 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Bus> getAllBuses(int routeId) throws SQLException {
+    public Collection<Bus> getAllBuses(String routeId) throws SQLException {
         List<Bus> buses = new ArrayList<>();
         ResultSet rs = executeQuery("SELECT * FROM bus WHERE route=" + routeId);
         while (rs.next()) {

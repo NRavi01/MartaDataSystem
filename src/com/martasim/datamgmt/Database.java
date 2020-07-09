@@ -111,7 +111,7 @@ public interface Database {
      * @return Route object with corresponding id
      * @throws SQLException
      */
-    Route getRoute(int id) throws SQLException;
+    Route getRoute(String id) throws SQLException;
 
     /**
      * Gets a Stop from the database
@@ -137,7 +137,7 @@ public interface Database {
      * @return Collection of type Bus containing all buses in database with the corresponding route ID
      * @throws SQLException
      */
-    Collection<Bus> getAllBuses(int routeId) throws SQLException;
+    Collection<Bus> getAllBuses(String routeId) throws SQLException;
 
     /**
      * Gets all events from the database
