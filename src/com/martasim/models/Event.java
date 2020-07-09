@@ -22,6 +22,14 @@ public class Event implements Cloneable {
                 ')';
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getTime() {
         return time;
     }
@@ -34,8 +42,8 @@ public class Event implements Cloneable {
         return type;
     }
 
-    public int getId() {
-        return id;
+    public void setType(EventType type) {
+        this.type = type;
     }
 
     @Override
