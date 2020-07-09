@@ -24,8 +24,8 @@ public class Route {
     @Override
     public String toString() {
         return "(" +
-                id + ", " +
-                shortName + ", " +
+                id + ", '" +
+                shortName + "', " +
                 '\'' + name + '\'' +
                 ")";
     }
