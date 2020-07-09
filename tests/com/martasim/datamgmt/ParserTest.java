@@ -3,7 +3,6 @@ package com.martasim.datamgmt;
 import com.martasim.models.Route;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.zip.ZipFile;
@@ -14,7 +13,7 @@ public class ParserTest {
     @Test
     void parse_route() throws SQLException, IOException {
         Database db = DatabaseFactory.createEmptyDatabase();
-        
+
         ZipFile zip = new ZipFile("/Users/wilwarner6/vcs/wwarner7/github.gatech.edu/MartaSimDataMgmt/src/com/martasim/data/gtfs022118.zip");
         GtfsParser parser = new GtfsParser(db, zip);
         parser.parse();
