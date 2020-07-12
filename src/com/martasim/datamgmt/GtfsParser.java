@@ -13,16 +13,15 @@ import java.util.zip.ZipFile;
 
 class GtfsParser extends Parser {
 
-
     GtfsParser(Database database, ZipFile zipFile) {
         super(database, zipFile);
     }
 
     @Override
     public void parse() {
-        // TODO: read the zip file, parse it, and add all information to the database
-
         try {
+//            addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/RENAME ME.txt")));
+//            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/RENAME ME.txt")));
             addRoutes(zipFile.getInputStream(zipFile.getEntry("gtfs022118/routes.txt")));
             addStops(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stops.txt")));
         } catch (IOException ioException) {
@@ -30,13 +29,21 @@ class GtfsParser extends Parser {
         }
     }
 
-    private void addRoutes(InputStream inputStream) throws IOException{
+    private void addBuses(InputStream inputStream) throws IOException {
+        // TODO
+    }
+
+    private void addEvents(InputStream inputStream) throws IOException {
+        // TODO
+    }
+
+    private void addRoutes(InputStream inputStream) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
         //initialize hash map with the first row of the file
         HashMap<String, String> map = new HashMap<>();
         String labels[] = br.readLine().split(",");
-        for (String label: labels) {
+        for (String label : labels) {
             map.put(label, "");
         }
 

@@ -45,7 +45,7 @@ class SQLiteDatabaseTest {
         Collection<Bus> buses = db.getAllBuses();
         assertEquals(0, buses.size());
 
-        Bus bus1 = new Bus(0, null, 0, 0, 0 , 10 , 0, 10, 0);
+        Bus bus1 = new Bus(0, null, true, 0, 0, 0 , 10 , 0, 10, 0);
         db.addBus(bus1);
 
         buses = db.getAllBuses();
@@ -59,7 +59,7 @@ class SQLiteDatabaseTest {
 
 
         Route route = new Route("0", "0", "route 0");
-        Bus bus2 = new Bus(1, route, 1, 1, 1 , 11 , 1, 11, 1);
+        Bus bus2 = new Bus(1, route, true, 1, 1, 1 , 11 , 1, 11, 1);
         db.addRoute(route);
         db.addBus(bus2);
         buses = db.getAllBuses();
@@ -110,7 +110,7 @@ class SQLiteDatabaseTest {
     void update_bus() throws Exception {
         Route routeA = new Route("1", "1", "Route 1");
         db.addRoute(routeA);
-        Bus busA = new Bus(0, routeA, 1, 1, 2, 10, 10, 20, 40);
+        Bus busA = new Bus(0, routeA, true, 1, 1, 2, 10, 10, 20, 40);
 
         db.addBus(busA);
         assertEquals(busA, db.getBus(busA.getId()));
@@ -184,8 +184,8 @@ class SQLiteDatabaseTest {
     @Test
     void remove_bus() throws Exception {
         Route R = new Route("0", "0", "0");
-        Bus A = new Bus(0, R, 0, 0, 0, 0, 0, 0, 0);
-        Bus B = new Bus(1, R, 1, 1, 1, 1, 1, 1, 1);
+        Bus A = new Bus(0, R, true, 0, 0, 0, 0, 0, 0, 0);
+        Bus B = new Bus(1, R, true, 1, 1, 1, 1, 1, 1, 1);
 
         db.addRoute(R);
         db.addBus(A);
@@ -259,7 +259,7 @@ class SQLiteDatabaseTest {
     @Test
     void read_bus() throws Exception {
         Route A = new Route("0", "0", "0");
-        Bus B = new Bus(0, A, 0, 0, 0, 0, 0, 0, 0);
+        Bus B = new Bus(0, A, true, 0, 0, 0, 0, 0, 0, 0);
 
         db.addRoute(A);
         db.addBus(B);
@@ -281,9 +281,9 @@ class SQLiteDatabaseTest {
         Route A = new Route("0", "0", "0");
         Route B = new Route("1", "1", "1");
         Route C = new Route("2", "2", "2");
-        Bus X = new Bus(0, A, 0, 0, 0, 0, 0, 0, 0);
-        Bus Y = new Bus(1, B, 1, 1, 5, 5, 0, 0, 0);
-        Bus Z = new Bus(2, C, 2, 2, 10, 10, 0, 0, 0);
+        Bus X = new Bus(0, A, true, 0, 0, 0, 0, 0, 0, 0);
+        Bus Y = new Bus(1, B, true, 1, 1, 5, 5, 0, 0, 0);
+        Bus Z = new Bus(2, C, true, 2, 2, 10, 10, 0, 0, 0);
         Collection<Bus> buses = new HashSet<>(Arrays.asList(X, Y, Z));
 
         db.addRoute(A);
@@ -301,9 +301,9 @@ class SQLiteDatabaseTest {
     void read_all_buses_routeid() throws Exception {
         Route A = new Route("0", "0", "0");
         Route B = new Route("1", "1", "1");
-        Bus X = new Bus(0, A, 0, 0, 0, 0, 0, 0, 0);
-        Bus Y = new Bus(1, B, 1, 1, 5, 5, 0, 0, 0);
-        Bus Z = new Bus(2, B, 2, 2, 10, 10, 0, 0, 0);
+        Bus X = new Bus(0, A, true, 0, 0, 0, 0, 0, 0, 0);
+        Bus Y = new Bus(1, B, true, 1, 1, 5, 5, 0, 0, 0);
+        Bus Z = new Bus(2, B, true, 2, 2, 10, 10, 0, 0, 0);
         Collection<Bus> buses = new HashSet<>(Arrays.asList(Y, Z));
 
         db.addRoute(A);

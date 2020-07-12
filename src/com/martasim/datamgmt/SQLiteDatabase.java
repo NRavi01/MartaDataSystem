@@ -39,7 +39,7 @@ public class SQLiteDatabase implements Database {
 
     public void clear() throws SQLException {
         executeUpdate("DROP TABLE IF EXISTS bus");
-        executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route INTEGER, currentStop INTEGER, latitude REAL, longitude REAL, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
+        executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route STRING, outbound INTEGER, currentStop INTEGER, latitude REAL, longitude REAL, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
         executeUpdate("DROP TABLE IF EXISTS route");
         executeUpdate("CREATE TABLE route (id STRING PRIMARY KEY, shortName STRING, name STRING)");
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
@@ -79,8 +79,8 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateBus(Bus bus) throws SQLException {
-        executeUpdate(String.format("UPDATE bus SET route=%d, currentStop=%d, latitude=%f, longitude=%f, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
-                 bus.getRoute().getId(), bus.getCurrentStopIndex(), bus.getLatitude(), bus.getLongitude(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
+        executeUpdate(String.format("UPDATE bus SET route='%s', outbound=%d, currentStop=%d, latitude=%f, longitude=%f, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
+                 bus.getRoute().getId(), bus.getOutboundAsInt(), bus.getCurrentStopIndex(), bus.getLatitude(), bus.getLongitude(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
         ));
     }
 
@@ -99,19 +99,19 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateRoute(Route route) throws SQLException {
-        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id=%s",
+        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id='%s'",
                 route.getShortName(), route.getName(), route.getId())));
     }
 
     @Override
     public void extendRoute(Route route, Stop stop) throws SQLException {
-        executeUpdate(String.format("INSERT INTO routeToStop values (%s, %s, %d)", route.getId(), stop.getId(), route.getStops().size()));
+        executeUpdate(String.format("INSERT INTO routeToStop values ('%s', '%s', %d)", route.getId(), stop.getId(), route.getStops().size()));
         route.extend(stop);
     }
 
     @Override
     public void updateStop(Stop stop) throws SQLException {
-        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%s",
+        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id='%s'",
                 stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
     }
 
@@ -129,6 +129,7 @@ public class SQLiteDatabase implements Database {
         return new Bus(
                 resultSet.getInt("id"),
                 getRoute(resultSet.getString("route")),
+                resultSet.getInt("outbound") != 0,
                 resultSet.getInt("currentStop"),
                 resultSet.getDouble("latitude"),
                 resultSet.getDouble("longitude"),
@@ -150,7 +151,7 @@ public class SQLiteDatabase implements Database {
     @Override
     public Route getRoute(String id) throws SQLException {
         Route route = null;
-        ResultSet resultSet = executeQuery("SELECT * FROM route WHERE id=" + id);
+        ResultSet resultSet = executeQuery("SELECT * FROM route WHERE id='" + id + '\'');
         if (resultSet.next()) {
             route = getRoute(resultSet);
         }
@@ -169,7 +170,7 @@ public class SQLiteDatabase implements Database {
     @Override
     public Stop getStop(String id) throws SQLException {
         Stop stop = null;
-        ResultSet resultSet = executeQuery("SELECT * FROM stop WHERE id=" + id);
+        ResultSet resultSet = executeQuery("SELECT * FROM stop WHERE id='" + id + '\'');
         if (resultSet.next()) {
             stop = getStop(resultSet);
         }
