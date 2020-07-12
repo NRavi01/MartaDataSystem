@@ -6,13 +6,19 @@ public class Stop {
     final int id;
     String name;
     int riders;
+    int previousRiders;
     double latitude;
     double longitude;
 
     public Stop(int id, String name, int riders, double latitude, double longitude) {
+        this(id, name, riders, -1, latitude, longitude);
+    }
+
+    public Stop(int id, String name, int riders, int previousRiders, double latitude, double longitude) {
         this.id = id;
         this.name = name;
         this.riders = riders;
+        this.previousRiders = previousRiders;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -23,6 +29,7 @@ public class Stop {
                 id + ", " +
                 '\'' + name + "', " +
                 riders + ", " +
+                previousRiders + ", " +
                 latitude + ", " +
                 longitude +
                 ")";
@@ -45,7 +52,14 @@ public class Stop {
     }
 
     public void setRiders(int riders) {
-        this.riders = riders;
+        if (riders != this.riders) {
+            this.previousRiders = this.riders;
+            this.riders = riders;
+        }
+    }
+
+    public int getPreviousRiders() {
+        return this.previousRiders;
     }
 
     public double getLatitude() {

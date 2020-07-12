@@ -45,7 +45,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
         executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, stopIndex INTEGER)");
         executeUpdate("DROP TABLE IF EXISTS stop");
-        executeUpdate("CREATE TABLE stop (id INTEGER PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
+        executeUpdate("CREATE TABLE stop (id INTEGER PRIMARY KEY, name STRING, riders INTEGER, previousRiders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
         executeUpdate("CREATE TABLE event (id INTEGER, time INTEGER, type STRING NOT NULL)");
     }
@@ -111,8 +111,8 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateStop(Stop stop) throws SQLException {
-        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%d",
-                stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
+        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, previousRiders=%d, latitude=%f, longitude=%f WHERE id=%d",
+                stop.getName(), stop.getRiders(), stop.getPreviousRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
     }
 
     @Override
@@ -181,6 +181,7 @@ public class SQLiteDatabase implements Database {
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
                 resultSet.getInt("riders"),
+                resultSet.getInt("previousRiders"),
                 resultSet.getDouble("latitude"),
                 resultSet.getDouble("longitude")
         );
