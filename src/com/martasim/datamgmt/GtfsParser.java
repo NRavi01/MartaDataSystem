@@ -22,10 +22,15 @@ class GtfsParser extends Parser {
     @Override
     public void parse() {
         try {
+            System.out.println("Parsing Route");
             addRoutes(zipFile.getInputStream(zipFile.getEntry("gtfs022118/routes.txt")));
+            System.out.println("Finished Routes, Parsing Stops");
             addStops(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stops.txt")));
-//            addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/trips.txt")));
+            System.out.println("Finished Stops, Parsing Buses");
+            addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/trips.txt")));
+            System.out.println("Finished Buses, Parsing Events");
 //            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stop_times.txt")));
+            System.out.println("Finished Events");
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
