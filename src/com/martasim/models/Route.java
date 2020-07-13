@@ -25,8 +25,8 @@ public class Route {
     public String toString() {
         return "('" +
                 id + "', '" +
-                shortName + "', " +
-                '\'' + name + '\'' +
+                shortName + "', '" +
+                 name + '\'' +
                 ")";
     }
 

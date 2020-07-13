@@ -107,9 +107,10 @@ class GtfsParser extends Parser {
             double lat = Double.parseDouble(map.get("stop_lat"));
             double lon = Double.parseDouble(map.get("stop_lon"));
             sb.append(String.format(
-                    "('%s', '%s', %d, %f, %f)",
+                    "('%s', '%s', %d, %d, %f, %f)",
                     stopId,
                     stopName,
+                    0,
                     0,
                     lat,
                     lon

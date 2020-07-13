@@ -155,14 +155,14 @@ public interface Database {
      * @return Collection of Events with corresponding busId
      * @throws SQLException
      */
-    Collection<Event> getAllEventsWithBusId(int busId) throws SQLException;
+    Collection<Event> getAllEventsWithBusId(String busId) throws SQLException;
 
     /**
      * @param stopId related to event
      * @return Collection of Events with corresponding stopId
      * @throws SQLException
      */
-    Collection<Event> getAllEventsWithStopId(int stopId) throws SQLException;
+    Collection<Event> getAllEventsWithStopId(String stopId) throws SQLException;
 
     /**
      * @param arrivalTime of Bus
@@ -202,7 +202,7 @@ public interface Database {
      * @return List of type Stop including the ordered stops from the corresponding route
      * @throws SQLException
      */
-    List<Stop> getAllStops(int routeId) throws SQLException;
+    List<Stop> getAllStops(String routeId) throws SQLException;
 
     /**
      * Removes a bus from the database.
@@ -244,7 +244,7 @@ public interface Database {
      * @param stopId  of stop to remove
      * @throws SQLException
      */
-    void removeFromRoute(int routeId, int stopId) throws SQLException;
+    void removeFromRoute(String routeId, String stopId) throws SQLException;
 
     /**
      * Removes a stop from the database.
@@ -253,4 +253,12 @@ public interface Database {
      * @throws SQLException
      */
     void removeStop(Stop stop) throws SQLException;
+
+    /**
+     * Removes a stop from the database.
+     *
+     * @param stopId of stop to remove from the database
+     * @throws SQLException
+     */
+    void removeStop(String stopId) throws SQLException;
 }

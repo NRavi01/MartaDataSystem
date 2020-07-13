@@ -16,7 +16,8 @@ public class ParserTest {
 
     @BeforeAll
     static void parse_data() throws SQLException, IOException {
-        ZipFile zip = new ZipFile("/Users/wilwarner6/vcs/wwarner7/github.gatech.edu/MartaSimDataMgmt/src/com/martasim/data/gtfs022118.zip");
+        ZipFile zip = new ZipFile("C:\\Users\\amaan\\Documents\\GitHub\\MartaSimDataMgmt\\src\\com\\martasim\\data" +
+                "\\gtfs022118.zip");
         db = DatabaseFactory.createDatabaseFromGtfs(zip);
     }
 

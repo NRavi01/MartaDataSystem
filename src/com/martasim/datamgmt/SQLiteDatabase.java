@@ -1,12 +1,15 @@
 package com.martasim.datamgmt;
 
-import com.martasim.models.*;
+import com.martasim.models.Bus;
+import com.martasim.models.Event;
+import com.martasim.models.Route;
+import com.martasim.models.Stop;
 
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 public class SQLiteDatabase implements Database {
 
@@ -45,7 +48,7 @@ public class SQLiteDatabase implements Database {
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
         executeUpdate("CREATE TABLE routeToStop (routeId STRING, stopId STRING, stopIndex INTEGER)");
         executeUpdate("DROP TABLE IF EXISTS stop");
-        executeUpdate("CREATE TABLE stop (id STRING PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
+        executeUpdate("CREATE TABLE stop (id STRING PRIMARY KEY, name STRING, riders INTEGER, previousRiders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
         executeUpdate("CREATE TABLE event (busId STRING, stopId STRING, arrivalTime INTEGER, departureTime INTEGER)");
     }
@@ -113,8 +116,9 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateStop(Stop stop) throws SQLException {
-        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id='%s'",
-                stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
+        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, previousRiders=%d, latitude=%f, " +
+                        "longitude=%f WHERE id='%s'",
+                stop.getName(), stop.getRiders(), stop.getPreviousRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
     }
 
     @Override
@@ -167,7 +171,7 @@ public class SQLiteDatabase implements Database {
                 resultSet.getString("id"),
                 resultSet.getString("shortName"),
                 resultSet.getString("name"),
-                getAllStops(resultSet.getInt("id"))
+                getAllStops(resultSet.getString("id"))
         );
     }
 
@@ -182,10 +186,11 @@ public class SQLiteDatabase implements Database {
     }
 
     private Stop getStop(ResultSet resultSet) throws SQLException {
-        return new Stop (
+        return new Stop(
                 resultSet.getString("id"),
                 resultSet.getString("name"),
                 resultSet.getInt("riders"),
+                resultSet.getInt("previousRiders"),
                 resultSet.getDouble("latitude"),
                 resultSet.getDouble("longitude")
         );
@@ -222,9 +227,12 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEventsWithBusId(int busId) throws SQLException {
+    public Collection<Event> getAllEventsWithBusId(String busId) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE busId'=" + busId + '\'');
+        ResultSet resultSet = executeQuery(String.format(
+                "SELECT * FROM event WHERE busId='%s'",
+                busId
+        ));
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -232,9 +240,12 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEventsWithStopId(int stopId) throws SQLException {
+    public Collection<Event> getAllEventsWithStopId(String stopId) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE stopId'=" + stopId + '\'');
+        ResultSet resultSet = executeQuery(String.format(
+                "SELECT * FROM event WHERE stopId='%s'",
+                stopId
+        ));
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -282,9 +293,12 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public List<Stop> getAllStops(int routeId) throws SQLException {
+    public List<Stop> getAllStops(String routeId) throws SQLException {
         List<Stop> stops = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId='" + routeId + "' ORDER BY stopIndex");
+        ResultSet resultSet = executeQuery(String.format(
+                "SELECT stopId FROM routeToStop WHERE routeId='%s' ORDER BY stopIndex",
+                routeId
+        ));
         while (resultSet.next()) {
             stops.add(getStop(resultSet.getString("stopId")));
         }
@@ -315,17 +329,41 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void removeFromRoute(Route route, Stop stop) throws SQLException {
-        // TODO
+        route.getStops().remove(stop);
+        removeFromRoute(route.getId(), stop.getId());
     }
 
     @Override
-    public void removeFromRoute(int routeId, int stopId) throws SQLException {
-        // TODO
+    public void removeFromRoute(String routeId, String stopId) throws SQLException {
+        ResultSet resultSet = executeQuery(String.format(
+                "SELECT stopIndex FROM routeToStop WHERE routeId='%s' AND stopId='%s'",
+                routeId,
+                stopId
+        ));
+        resultSet.next();
+        int stopIndex = resultSet.getInt("stopIndex");
+        executeUpdate(String.format("DELETE FROM routeToStop WHERE routeId='%s' AND stopId='%s'", routeId, stopId));
+        executeUpdate(String.format(
+                "UPDATE routeToStop SET stopIndex = stopIndex - 1 WHERE routeId='%s' AND stopIndex>%d",
+                routeId,
+                stopIndex
+        ));
     }
 
     @Override
     public void removeStop(Stop stop) throws SQLException {
-        executeUpdate("DELETE FROM stop WHERE id='" + stop.getId() + '\'');
-        executeUpdate("DELETE FROM routeToStop WHERE stopId='" + stop.getId() + '\'');
+        removeStop(stop.getId());
+    }
+
+    @Override
+    public void removeStop(String stopId) throws SQLException {
+        ResultSet resultSet = executeQuery(String.format(
+                "SELECT routeId FROM routeToStop WHERE stopId='%s'",
+                stopId
+        ));
+        while (resultSet.next()) {
+            removeFromRoute(resultSet.getString("routeId"), stopId);
+        }
+        executeUpdate("DELETE FROM stop WHERE id='" + stopId + '\'');
     }
 }
