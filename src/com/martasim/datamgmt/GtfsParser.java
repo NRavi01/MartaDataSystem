@@ -144,33 +144,33 @@ class GtfsParser extends Parser {
         br.close();
     }
 
-//    private void addEvents(InputStream inputStream) throws IOException {
-//        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-//
-//        HashMap<String, Integer> map = new HashMap<>();
-//        String labels[] = br.readLine().split(",");
-//        for (int i = 0; i < labels.length; i++) {
-//            map.put(labels[i], i);
-//        }
-//
-//        String line;
-//        while ((line = br.readLine()) != null && !line.isEmpty()) {
-//            String st[] = (line + " ").split(",");
-//            String busId = st[map.get("trip_id")];
-//            String stopId = st[map.get("stop_id")];
-//            int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
-//            int departureTime = getLogicalTimeFromTimeString(st[map.get("departure_time")]);
-//
-//            try {
-//                database.addEvent(new Event(busId, stopId, arrivalTime, departureTime));
-//                // TODO: extend routes over here based on stop_sequence and if the bus is outbound
-//            } catch (SQLException sqlException) {
-//                sqlException.printStackTrace();
-//            }
-//        }
-//
-//        br.close();
-//    }
+    private void addEvents(InputStream inputStream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        HashMap<String, Integer> map = new HashMap<>();
+        String labels[] = br.readLine().split(",");
+        for (int i = 0; i < labels.length; i++) {
+            map.put(labels[i], i);
+        }
+
+        String line;
+        while ((line = br.readLine()) != null && !line.isEmpty()) {
+            String st[] = (line + " ").split(",");
+            String busId = st[map.get("trip_id")];
+            String stopId = st[map.get("stop_id")];
+            int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
+            int departureTime = getLogicalTimeFromTimeString(st[map.get("departure_time")]);
+
+            try {
+                database.addEvent(new Event(busId, stopId, arrivalTime, departureTime));
+                // TODO: extend routes over here based on stop_sequence and if the bus is outbound
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        }
+
+        br.close();
+    }
 
     /**
      * @param timeString in the format HH:MM:SS
