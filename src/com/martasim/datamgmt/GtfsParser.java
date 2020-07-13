@@ -1,7 +1,6 @@
 package com.martasim.datamgmt;
 
 import com.martasim.models.Route;
-import com.martasim.models.Stop;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,14 +38,14 @@ class GtfsParser extends Parser {
 
         //initialize hash map with the first row of the file
         HashMap<String, String> map = new HashMap<>();
-        String labels[] = br.readLine().split(",");
+        String[] labels = br.readLine().split(",");
         for (String label : labels) {
             map.put(label, "");
         }
 
         String line;
         while ((line = br.readLine()) != null) {
-            String st[] = (line + " ").split(",");
+            String[] st = (line + " ").split(",");
 
             try {
                 for (int i = 0; i < labels.length; i++) {
@@ -66,7 +65,7 @@ class GtfsParser extends Parser {
 
         //initialize hash map with the first row of the file
         HashMap<String, String> map = new HashMap<>();
-        String labels[] = br.readLine().split(",");
+        String[] labels = br.readLine().split(",");
         for (String label: labels) {
             map.put(label, "");
         }
@@ -75,7 +74,7 @@ class GtfsParser extends Parser {
         int counter = 0;
         String line;
         while ((line = br.readLine()) != null && !line.isEmpty()) {
-            String st[] = (line + " ").split(",");
+            String[] st = (line + " ").split(",");
             int st_index = 0;
             //update strings including apostrophes to work with SQL INSERT command
             for (String label: labels) {
@@ -132,7 +131,7 @@ class GtfsParser extends Parser {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
         HashMap<String, Integer> map = new HashMap<>();
-        String labels[] = br.readLine().split(",");
+        String[] labels = br.readLine().split(",");
         for (int i = 0; i < labels.length; i++) {
             map.put(labels[i], i);
         }
@@ -171,7 +170,7 @@ class GtfsParser extends Parser {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
         HashMap<String, Integer> map = new HashMap<>();
-        String labels[] = br.readLine().split(",");
+        String[] labels = br.readLine().split(",");
         for (int i = 0; i < labels.length; i++) {
             map.put(labels[i], i);
         }
@@ -194,7 +193,7 @@ class GtfsParser extends Parser {
             }
             counter++;
 
-            String st[] = (line + " ").split(",");
+            String[] st = (line + " ").split(",");
             String busId = st[map.get("trip_id")];
             String stopId = st[map.get("stop_id")];
             int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
