@@ -24,7 +24,7 @@ public class SQLiteDatabase implements Database {
         connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", databasePath));
     }
 
-    private void executeUpdate(String sql) throws SQLException {
+    public void executeUpdate(String sql) throws SQLException {
         Statement statement = connection.createStatement();
         statement.executeUpdate(sql);
         statement.closeOnCompletion();
