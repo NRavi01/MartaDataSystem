@@ -1,7 +1,5 @@
 package com.martasim.datamgmt;
 
-import com.martasim.models.Bus;
-import com.martasim.models.Event;
 import com.martasim.models.Route;
 import com.martasim.models.Stop;
 
@@ -29,7 +27,7 @@ class GtfsParser extends Parser {
             System.out.println("Finished Stops, Parsing Buses");
             addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/trips.txt")));
             System.out.println("Finished Buses, Parsing Events");
-//            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stop_times.txt")));
+            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stop_times.txt")));
             System.out.println("Finished Events");
         } catch (IOException ioException) {
             ioException.printStackTrace();
@@ -153,17 +151,41 @@ class GtfsParser extends Parser {
             map.put(labels[i], i);
         }
 
+        StringBuilder sb = null;
+        int counter = 0;
         String line;
         while ((line = br.readLine()) != null && !line.isEmpty()) {
+            if (counter % 10000 == 0) {
+                if (counter > 0) {
+                    try {
+                        ((SQLiteDatabase) database).executeUpdate(sb.toString());
+                    } catch (SQLException sqlException) {
+                        sqlException.printStackTrace();
+                    }
+                }
+                sb = new StringBuilder("INSERT INTO event values ");
+            } else {
+                sb.append(',');
+            }
+            counter++;
+
             String st[] = (line + " ").split(",");
             String busId = st[map.get("trip_id")];
             String stopId = st[map.get("stop_id")];
             int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
             int departureTime = getLogicalTimeFromTimeString(st[map.get("departure_time")]);
+            sb.append(String.format(
+                    "('%s', '%s', %d, %d)",
+                    busId,
+                    stopId,
+                    arrivalTime,
+                    departureTime
+            ));
+        }
 
+        if (counter % 10000 > 0) {
             try {
-                database.addEvent(new Event(busId, stopId, arrivalTime, departureTime));
-                // TODO: extend routes over here based on stop_sequence and if the bus is outbound
+                ((SQLiteDatabase) database).executeUpdate(sb.toString());
             } catch (SQLException sqlException) {
                 sqlException.printStackTrace();
             }
