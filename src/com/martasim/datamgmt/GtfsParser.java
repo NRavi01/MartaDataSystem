@@ -1,5 +1,6 @@
 package com.martasim.datamgmt;
 
+import com.martasim.models.Event;
 import com.martasim.models.Route;
 import com.martasim.models.Stop;
 
@@ -21,7 +22,7 @@ class GtfsParser extends Parser {
     public void parse() {
         try {
 //            addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/RENAME ME.txt")));
-//            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/RENAME ME.txt")));
+            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stop_times.txt")));
             addRoutes(zipFile.getInputStream(zipFile.getEntry("gtfs022118/routes.txt")));
             addStops(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stops.txt")));
         } catch (IOException ioException) {
@@ -34,7 +35,44 @@ class GtfsParser extends Parser {
     }
 
     private void addEvents(InputStream inputStream) throws IOException {
-        // TODO
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        HashMap<String, Integer> map = new HashMap<>();
+        String labels[] = br.readLine().split(",");
+        for (int i = 0; i < labels.length; i++) {
+            map.put(labels[i], i);
+        }
+
+        String line;
+        while ((line = br.readLine()) != null && !line.isEmpty()) {
+            String st[] = (line + " ").split(",");
+            String busId = st[map.get("trip_id")];
+            String stopId = st[map.get("stop_id")];
+            int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
+            int departureTime = getLogicalTimeFromTimeString(st[map.get("departure_time")]);
+
+            try {
+                database.addEvent(new Event(busId, stopId, arrivalTime, departureTime));
+                // TODO: extend routes over here based on stop_sequence and if the bus is outbound
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        }
+
+        br.close();
+    }
+
+    /**
+     * @param timeString in the format HH:MM:SS
+     * @return the number of seconds since 00:00:00
+     */
+    int getLogicalTimeFromTimeString(String timeString) {
+        String[] time = timeString.split(":");
+        int hours = Integer.parseInt(time[0]);
+        int min = Integer.parseInt(time[0]);
+        int sec = Integer.parseInt(time[0]);
+
+        return sec + (60 * min) + (60 * 60 * hours);
     }
 
     private void addRoutes(InputStream inputStream) throws IOException {

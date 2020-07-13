@@ -3,7 +3,7 @@ package com.martasim.models;
 import java.util.Objects;
 
 public class Bus {
-    final int id;
+    final String id;
     Route route;
     boolean outbound;
     int currentStop;
@@ -15,12 +15,12 @@ public class Bus {
     double fuelCapacity;
     double speed;
 
-    public Bus(int id, Route route, boolean outbound, double latitude, double longitude, int passengers,
+    public Bus(String id, Route route, boolean outbound, double latitude, double longitude, int passengers,
                int passengerCapacity, double fuel, double fuelCapacity, double speed) {
         this(id, route, outbound, -1, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
     }
 
-    public Bus(int id, Route route, boolean outbound, int currentStop, double latitude, double longitude, int passengers,
+    public Bus(String id, Route route, boolean outbound, int currentStop, double latitude, double longitude, int passengers,
                int passengerCapacity, double fuel, double fuelCapacity, double speed) {
         this.id = id;
         this.route = route;
@@ -37,8 +37,8 @@ public class Bus {
 
     @Override
     public String toString() {
-        return "(" +
-                id + ", " +
+        return "('" +
+                id + "', " +
                 (route == null ? "null" : route.id) + ", " +
                 outbound + ", " +
                 currentStop + ", " +
@@ -52,7 +52,7 @@ public class Bus {
                 ")";
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -168,7 +168,7 @@ public class Bus {
         if (this == o) return true;
         if (!(o instanceof Bus)) return false;
         Bus bus = (Bus) o;
-        return id == bus.id &&
+        return outbound == bus.outbound &&
                 currentStop == bus.currentStop &&
                 Double.compare(bus.latitude, latitude) == 0 &&
                 Double.compare(bus.longitude, longitude) == 0 &&
@@ -177,11 +177,12 @@ public class Bus {
                 Double.compare(bus.fuel, fuel) == 0 &&
                 Double.compare(bus.fuelCapacity, fuelCapacity) == 0 &&
                 Double.compare(bus.speed, speed) == 0 &&
+                Objects.equals(id, bus.id) &&
                 Objects.equals(route, bus.route);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, route, currentStop, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
+        return Objects.hash(id, route, outbound, currentStop, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
     }
 }

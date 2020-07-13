@@ -19,8 +19,8 @@ public class Stop {
 
     @Override
     public String toString() {
-        return "(\'" +
-                id + "\', " +
+        return "('" +
+                id + "', " +
                 '\'' + name + "', " +
                 riders + ", " +
                 latitude + ", " +
