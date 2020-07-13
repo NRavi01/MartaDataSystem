@@ -12,16 +12,12 @@ import java.util.zip.ZipFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserTest {
-    static Database db;
-    static GtfsParser parser;
+    static private Database db;
 
     @BeforeAll
     static void parse_data() throws SQLException, IOException {
-        db = DatabaseFactory.createEmptyDatabase();
-
         ZipFile zip = new ZipFile("/Users/wilwarner6/vcs/wwarner7/github.gatech.edu/MartaSimDataMgmt/src/com/martasim/data/gtfs022118.zip");
-        parser = new GtfsParser(db, zip);
-        parser.parse();
+        db = DatabaseFactory.createDatabaseFromGtfs(zip);
     }
 
     @Test
