@@ -1,5 +1,6 @@
 package com.martasim.datamgmt;
 
+import com.martasim.models.Bus;
 import com.martasim.models.Event;
 import com.martasim.models.Route;
 import com.martasim.models.Stop;
@@ -21,58 +22,13 @@ class GtfsParser extends Parser {
     @Override
     public void parse() {
         try {
-//            addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/RENAME ME.txt")));
-            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stop_times.txt")));
             addRoutes(zipFile.getInputStream(zipFile.getEntry("gtfs022118/routes.txt")));
             addStops(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stops.txt")));
+//            addBuses(zipFile.getInputStream(zipFile.getEntry("gtfs022118/trips.txt")));
+            addEvents(zipFile.getInputStream(zipFile.getEntry("gtfs022118/stop_times.txt")));
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-    }
-
-    private void addBuses(InputStream inputStream) throws IOException {
-        // TODO
-    }
-
-    private void addEvents(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
-        HashMap<String, Integer> map = new HashMap<>();
-        String labels[] = br.readLine().split(",");
-        for (int i = 0; i < labels.length; i++) {
-            map.put(labels[i], i);
-        }
-
-        String line;
-        while ((line = br.readLine()) != null && !line.isEmpty()) {
-            String st[] = (line + " ").split(",");
-            String busId = st[map.get("trip_id")];
-            String stopId = st[map.get("stop_id")];
-            int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
-            int departureTime = getLogicalTimeFromTimeString(st[map.get("departure_time")]);
-
-            try {
-                database.addEvent(new Event(busId, stopId, arrivalTime, departureTime));
-                // TODO: extend routes over here based on stop_sequence and if the bus is outbound
-            } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
-            }
-        }
-
-        br.close();
-    }
-
-    /**
-     * @param timeString in the format HH:MM:SS
-     * @return the number of seconds since 00:00:00
-     */
-    int getLogicalTimeFromTimeString(String timeString) {
-        String[] time = timeString.split(":");
-        int hours = Integer.parseInt(time[0]);
-        int min = Integer.parseInt(time[0]);
-        int sec = Integer.parseInt(time[0]);
-
-        return sec + (60 * min) + (60 * 60 * hours);
     }
 
     private void addRoutes(InputStream inputStream) throws IOException {
@@ -142,5 +98,85 @@ class GtfsParser extends Parser {
         }
 
         br.close();
+    }
+
+    private void addBuses(InputStream inputStream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        HashMap<String, Integer> map = new HashMap<>();
+        String labels[] = br.readLine().split(",");
+        for (int i = 0; i < labels.length; i++) {
+            map.put(labels[i], i);
+        }
+
+//        String line;
+//        while ((line = br.readLine()) != null && !line.isEmpty()) {
+//            String st[] = (line + ", ").split(",");
+//            String routeId = st[map.get("route_id")];
+//            String serviceId = st[map.get("service_id")];
+//            String busId = st[map.get("trip_id")];
+//            boolean outbound = st[map.get("direction_id")].trim().charAt(0) == '0';
+//
+//            try {
+//                // TODO: add bus here
+//                database.addBus(new Bus(
+//                        busId,
+//                        database.getRoute(routeId),
+//                        outbound,
+//                        /* TODO: get latitude */,
+//                        /* TODO: get longitude */,
+//                        /* TODO: get passengers */,
+//                        /* TODO: get passengerCapacity */,
+//                        /* TODO: get fuel */,
+//                        /* TODO: get fuelCapacity */,
+//                        /* TODO: get speed */
+//                        ));
+//            } catch (SQLException sqlException) {
+//                sqlException.printStackTrace();
+//            }
+//        }
+
+        br.close();
+    }
+
+    private void addEvents(InputStream inputStream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        HashMap<String, Integer> map = new HashMap<>();
+        String labels[] = br.readLine().split(",");
+        for (int i = 0; i < labels.length; i++) {
+            map.put(labels[i], i);
+        }
+
+        String line;
+        while ((line = br.readLine()) != null && !line.isEmpty()) {
+            String st[] = (line + " ").split(",");
+            String busId = st[map.get("trip_id")];
+            String stopId = st[map.get("stop_id")];
+            int arrivalTime = getLogicalTimeFromTimeString(st[map.get("arrival_time")]);
+            int departureTime = getLogicalTimeFromTimeString(st[map.get("departure_time")]);
+
+            try {
+                database.addEvent(new Event(busId, stopId, arrivalTime, departureTime));
+                // TODO: extend routes over here based on stop_sequence and if the bus is outbound
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        }
+
+        br.close();
+    }
+
+    /**
+     * @param timeString in the format HH:MM:SS
+     * @return the number of seconds since 00:00:00
+     */
+    int getLogicalTimeFromTimeString(String timeString) {
+        String[] time = timeString.split(":");
+        int hours = Integer.parseInt(time[0]);
+        int min = Integer.parseInt(time[0]);
+        int sec = Integer.parseInt(time[0]);
+
+        return sec + (60 * min) + (60 * 60 * hours);
     }
 }
