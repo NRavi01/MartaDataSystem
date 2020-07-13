@@ -42,7 +42,7 @@ public class DatabaseFactory {
      * @throws SQLException
      */
     public static Database createDatabaseFromGtfs(ZipFile zipFile) throws SQLException {
-        Database database = new SQLiteDatabase();
+        Database database = createEmptyDatabase();
         (new GtfsParser(database, zipFile)).parse();
         return database;
     }

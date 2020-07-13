@@ -23,8 +23,8 @@ public class Route {
 
     @Override
     public String toString() {
-        return "(" +
-                id + ", '" +
+        return "('" +
+                id + "', '" +
                 shortName + "', " +
                 '\'' + name + '\'' +
                 ")";

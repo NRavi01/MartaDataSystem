@@ -39,15 +39,15 @@ public class SQLiteDatabase implements Database {
 
     public void clear() throws SQLException {
         executeUpdate("DROP TABLE IF EXISTS bus");
-        executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route INTEGER, currentStop INTEGER, latitude REAL, longitude REAL, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
+        executeUpdate("CREATE TABLE bus (id INTEGER PRIMARY KEY, route STRING, outbound INTEGER, currentStop INTEGER, latitude REAL, longitude REAL, passengers INTEGER, passengerCapacity INTEGER, fuel real, fuelCapacity REAL, speed REAL)");
         executeUpdate("DROP TABLE IF EXISTS route");
         executeUpdate("CREATE TABLE route (id STRING PRIMARY KEY, shortName STRING, name STRING)");
         executeUpdate("DROP TABLE IF EXISTS routeToStop");
-        executeUpdate("CREATE TABLE routeToStop (routeId INTEGER, stopId INTEGER, stopIndex INTEGER)");
+        executeUpdate("CREATE TABLE routeToStop (routeId STRING, stopId STRING, stopIndex INTEGER)");
         executeUpdate("DROP TABLE IF EXISTS stop");
         executeUpdate("CREATE TABLE stop (id STRING PRIMARY KEY, name STRING, riders INTEGER, latitude REAL, longitude REAL)");
         executeUpdate("DROP TABLE IF EXISTS event");
-        executeUpdate("CREATE TABLE event (id INTEGER, time INTEGER, type STRING NOT NULL)");
+        executeUpdate("CREATE TABLE event (busId STRING, stopId STRING, arrivalTime INTEGER, departureTime INTEGER)");
     }
 
     @Override
@@ -79,46 +79,48 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void updateBus(Bus bus) throws SQLException {
-        executeUpdate(String.format("UPDATE bus SET route=%d, currentStop=%d, latitude=%f, longitude=%f, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id=%d",
-                 bus.getRoute().getId(), bus.getCurrentStopIndex(), bus.getLatitude(), bus.getLongitude(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
+        executeUpdate(String.format("UPDATE bus SET route='%s', outbound=%d, currentStop=%d, latitude=%f, longitude=%f, passengers=%d, passengerCapacity=%d, fuel=%f, fuelCapacity=%f, speed=%f WHERE id='%s'",
+                 bus.getRoute().getId(), bus.getOutboundAsInt(), bus.getCurrentStopIndex(), bus.getLatitude(), bus.getLongitude(), bus.getPassengers(), bus.getPassengerCapacity(), bus.getFuel(), bus.getFuelCapacity(), bus.getSpeed(), bus.getId()
         ));
     }
 
     @Override
     public void updateEvent(Event oldEvent, Event newEvent) throws SQLException {
         executeUpdate(String.format(
-                "UPDATE event SET id=%d, time=%d, type='%s' WHERE id=%d AND time=%d AND type='%s'",
-                newEvent.getId(),
-                newEvent.getTime(),
-                newEvent.getType().name(),
-                oldEvent.getId(),
-                oldEvent.getTime(),
-                oldEvent.getType().name()
+                "UPDATE event SET busId='%s', stopId='%s', arrivalTime=%d, departureTime=%d WHERE busId='%s' AND stopId='%s' AND arrivalTime=%d AND departureTime=%d",
+                newEvent.getBusId(),
+                newEvent.getStopId(),
+                newEvent.getArrivalTime(),
+                newEvent.getDepartureTime(),
+                oldEvent.getBusId(),
+                oldEvent.getStopId(),
+                oldEvent.getArrivalTime(),
+                oldEvent.getDepartureTime()
         ));
     }
 
     @Override
     public void updateRoute(Route route) throws SQLException {
-        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id=%s",
+        executeUpdate((String.format("UPDATE route SET shortName='%s', name='%s' WHERE id='%s'",
                 route.getShortName(), route.getName(), route.getId())));
     }
 
     @Override
     public void extendRoute(Route route, Stop stop) throws SQLException {
-        executeUpdate(String.format("INSERT INTO routeToStop values (%s, %s, %d)", route.getId(), stop.getId(), route.getStops().size()));
+        executeUpdate(String.format("INSERT INTO routeToStop values ('%s', '%s', %d)", route.getId(), stop.getId(), route.getStops().size()));
         route.extend(stop);
     }
 
     @Override
     public void updateStop(Stop stop) throws SQLException {
-        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id=%s",
+        executeUpdate((String.format("UPDATE stop SET name='%s', riders=%d, latitude=%f, longitude=%f WHERE id='%s'",
                 stop.getName(), stop.getRiders(), stop.getLatitude(), stop.getLongitude(), stop.getId())));
     }
 
     @Override
-    public Bus getBus(int id) throws SQLException {
+    public Bus getBus(String id) throws SQLException {
         Bus bus = null;
-        ResultSet resultSet = executeQuery("SELECT * FROM bus WHERE id=" + id);
+        ResultSet resultSet = executeQuery("SELECT * FROM bus WHERE id='" + id + '\'');
         if (resultSet.next()) {
             bus = getBus(resultSet);
         }
@@ -127,8 +129,9 @@ public class SQLiteDatabase implements Database {
 
     private Bus getBus(ResultSet resultSet) throws SQLException {
         return new Bus(
-                resultSet.getInt("id"),
+                resultSet.getString("id"),
                 getRoute(resultSet.getString("route")),
+                resultSet.getInt("outbound") != 0,
                 resultSet.getInt("currentStop"),
                 resultSet.getDouble("latitude"),
                 resultSet.getDouble("longitude"),
@@ -142,15 +145,17 @@ public class SQLiteDatabase implements Database {
 
     private Event getEvent(ResultSet resultSet) throws SQLException {
         return new Event(
-                resultSet.getInt("id"), resultSet.getInt("time"),
-                EventType.valueOf(resultSet.getString("type"))
+                resultSet.getString("busId"),
+                resultSet.getString("stopId"),
+                resultSet.getInt("arrivalTime"),
+                resultSet.getInt("departureTime")
         );
     }
 
     @Override
     public Route getRoute(String id) throws SQLException {
         Route route = null;
-        ResultSet resultSet = executeQuery("SELECT * FROM route WHERE id=" + id);
+        ResultSet resultSet = executeQuery("SELECT * FROM route WHERE id='" + id + '\'');
         if (resultSet.next()) {
             route = getRoute(resultSet);
         }
@@ -169,7 +174,7 @@ public class SQLiteDatabase implements Database {
     @Override
     public Stop getStop(String id) throws SQLException {
         Stop stop = null;
-        ResultSet resultSet = executeQuery("SELECT * FROM stop WHERE id=" + id);
+        ResultSet resultSet = executeQuery("SELECT * FROM stop WHERE id='" + id + '\'');
         if (resultSet.next()) {
             stop = getStop(resultSet);
         }
@@ -217,9 +222,9 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEventsWithId(int id) throws SQLException {
+    public Collection<Event> getAllEventsWithBusId(int busId) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE id=" + id);
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE busId'=" + busId + '\'');
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -227,9 +232,9 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEventsWithTime(int time) throws SQLException {
+    public Collection<Event> getAllEventsWithStopId(int stopId) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE time=" + time);
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE stopId'=" + stopId + '\'');
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -237,9 +242,19 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public Collection<Event> getAllEventsWithType(EventType type) throws SQLException {
+    public Collection<Event> getAllEventsWithArrivalTime(int arrivalTime) throws SQLException {
         List<Event> events = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE type='" + type.name() + '\'');
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE arrivalTime=" + arrivalTime);
+        while (resultSet.next()) {
+            events.add(getEvent(resultSet));
+        }
+        return events;
+    }
+
+    @Override
+    public Collection<Event> getAllEventsWithDepartureTime(int departureTime) throws SQLException {
+        List<Event> events = new ArrayList<>();
+        ResultSet resultSet = executeQuery("SELECT * FROM event WHERE departureTime=" + departureTime);
         while (resultSet.next()) {
             events.add(getEvent(resultSet));
         }
@@ -269,7 +284,7 @@ public class SQLiteDatabase implements Database {
     @Override
     public List<Stop> getAllStops(int routeId) throws SQLException {
         List<Stop> stops = new ArrayList<>();
-        ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId=" + routeId + " ORDER BY stopIndex");
+        ResultSet resultSet = executeQuery("SELECT * FROM routeToStop WHERE routeId='" + routeId + "' ORDER BY stopIndex");
         while (resultSet.next()) {
             stops.add(getStop(resultSet.getString("stopId")));
         }
@@ -278,18 +293,24 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void removeBus(Bus bus) throws SQLException {
-        executeUpdate("DELETE FROM bus WHERE id=" + bus.getId());
+        executeUpdate("DELETE FROM bus WHERE id='" + bus.getId() + '\'');
     }
 
     @Override
     public void removeEvent(Event event) throws SQLException {
-        executeUpdate("DELETE FROM event WHERE id=" + event.getId());
+        executeUpdate(String.format(
+                "DELETE FROM event WHERE busId='%s' AND stopId='%s' AND arrivalTime=%d AND departureTime=%d",
+                event.getBusId(),
+                event.getStopId(),
+                event.getArrivalTime(),
+                event.getDepartureTime()
+        ));
     }
 
     @Override
     public void removeRoute(Route route) throws SQLException {
-        executeUpdate("DELETE FROM route WHERE id=" + route.getId());
-        executeUpdate("DELETE FROM routeToStop WHERE routeId=" + route.getId());
+        executeUpdate("DELETE FROM route WHERE id='" + route.getId() + '\'');
+        executeUpdate("DELETE FROM routeToStop WHERE routeId='" + route.getId() + '\'');
     }
 
     @Override
@@ -304,7 +325,7 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void removeStop(Stop stop) throws SQLException {
-        executeUpdate("DELETE FROM stop WHERE id=" + stop.getId());
-        executeUpdate("DELETE FROM routeToStop WHERE stopId=" + stop.getId());
+        executeUpdate("DELETE FROM stop WHERE id='" + stop.getId() + '\'');
+        executeUpdate("DELETE FROM routeToStop WHERE stopId='" + stop.getId() + '\'');
     }
 }

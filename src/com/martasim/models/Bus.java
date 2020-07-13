@@ -3,8 +3,9 @@ package com.martasim.models;
 import java.util.Objects;
 
 public class Bus {
-    final int id;
+    final String id;
     Route route;
+    boolean outbound;
     int currentStop;
     double latitude;
     double longitude;
@@ -14,15 +15,16 @@ public class Bus {
     double fuelCapacity;
     double speed;
 
-    public Bus(int id, Route route, double latitude, double longitude, int passengers,
+    public Bus(String id, Route route, boolean outbound, double latitude, double longitude, int passengers,
                int passengerCapacity, double fuel, double fuelCapacity, double speed) {
-        this(id, route, -1, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
+        this(id, route, outbound, -1, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
     }
 
-    public Bus(int id, Route route, int currentStop, double latitude, double longitude, int passengers,
+    public Bus(String id, Route route, boolean outbound, int currentStop, double latitude, double longitude, int passengers,
                int passengerCapacity, double fuel, double fuelCapacity, double speed) {
         this.id = id;
         this.route = route;
+        this.outbound = outbound;
         this.setCurrentStopIndex(currentStop);
         this.latitude = latitude;
         this.longitude = longitude;
@@ -35,9 +37,10 @@ public class Bus {
 
     @Override
     public String toString() {
-        return "(" +
-                id + ", " +
+        return "('" +
+                id + "', " +
                 (route == null ? "null" : route.id) + ", " +
+                outbound + ", " +
                 currentStop + ", " +
                 latitude + ", " +
                 longitude + ", " +
@@ -49,7 +52,7 @@ public class Bus {
                 ")";
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -59,6 +62,22 @@ public class Bus {
 
     public void setRoute(Route route) {
         this.route = route;
+    }
+
+    public boolean isOutbound() {
+        return outbound;
+    }
+
+    public int getOutboundAsInt() {
+        return outbound ? 1 : 0;
+    }
+
+    public void setOutbound(boolean outbound) {
+        this.outbound = outbound;
+    }
+
+    public void setOutbound(int outbound) {
+        this.outbound = outbound != 0;
     }
 
     public int getCurrentStopIndex() {
@@ -86,29 +105,6 @@ public class Bus {
             return null;
         }
         return route.getStops().get(currentStop);
-    }
-
-    public int getNextStopIndex() {
-        if (currentStop == -1) {
-            return -1;
-        }
-
-        return (currentStop + 1) % route.getStops().size();
-    }
-
-    public Stop getNextStop() {
-        if (getNextStopIndex() == -1) {
-            return null;
-        }
-
-        return route.getStops().get(getNextStopIndex());
-    }
-
-    /**
-     * Goes to the next stop if it exits and is possible
-     */
-    public void goToNextStop() {
-        currentStop = getNextStopIndex();
     }
 
     public double getLatitude() {
@@ -172,7 +168,7 @@ public class Bus {
         if (this == o) return true;
         if (!(o instanceof Bus)) return false;
         Bus bus = (Bus) o;
-        return id == bus.id &&
+        return outbound == bus.outbound &&
                 currentStop == bus.currentStop &&
                 Double.compare(bus.latitude, latitude) == 0 &&
                 Double.compare(bus.longitude, longitude) == 0 &&
@@ -181,11 +177,12 @@ public class Bus {
                 Double.compare(bus.fuel, fuel) == 0 &&
                 Double.compare(bus.fuelCapacity, fuelCapacity) == 0 &&
                 Double.compare(bus.speed, speed) == 0 &&
+                Objects.equals(id, bus.id) &&
                 Objects.equals(route, bus.route);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, route, currentStop, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
+        return Objects.hash(id, route, outbound, currentStop, latitude, longitude, passengers, passengerCapacity, fuel, fuelCapacity, speed);
     }
 }

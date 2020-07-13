@@ -1,13 +1,17 @@
 package com.martasim.datamgmt;
 
-import com.martasim.models.*;
+import com.martasim.models.Bus;
+import com.martasim.models.Event;
+import com.martasim.models.Route;
+import com.martasim.models.Stop;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,7 +49,7 @@ class SQLiteDatabaseTest {
         Collection<Bus> buses = db.getAllBuses();
         assertEquals(0, buses.size());
 
-        Bus bus1 = new Bus(0, null, 0, 0, 0 , 10 , 0, 10, 0);
+        Bus bus1 = new Bus("0", null, true, 0, 0, 0, 10, 0, 10, 0);
         db.addBus(bus1);
 
         buses = db.getAllBuses();
@@ -59,7 +63,7 @@ class SQLiteDatabaseTest {
 
 
         Route route = new Route("0", "0", "route 0");
-        Bus bus2 = new Bus(1, route, 1, 1, 1 , 11 , 1, 11, 1);
+        Bus bus2 = new Bus("1", route, true, 1, 1, 1, 11, 1, 11, 1);
         db.addRoute(route);
         db.addBus(bus2);
         buses = db.getAllBuses();
@@ -88,7 +92,7 @@ class SQLiteDatabaseTest {
         Collection<Event> events = db.getAllEvents();
         assertEquals(0, events.size());
 
-        Event event = new Event (0, 0 , EventType.move_bus);
+        Event event = new Event("0", "0", 0, 0);
 
         db.addEvent(event);
 
@@ -110,7 +114,7 @@ class SQLiteDatabaseTest {
     void update_bus() throws Exception {
         Route routeA = new Route("1", "1", "Route 1");
         db.addRoute(routeA);
-        Bus busA = new Bus(0, routeA, 1, 1, 2, 10, 10, 20, 40);
+        Bus busA = new Bus("0", routeA, true, 1, 1, 2, 10, 10, 20, 40);
 
         db.addBus(busA);
         assertEquals(busA, db.getBus(busA.getId()));
@@ -168,11 +172,11 @@ class SQLiteDatabaseTest {
 
     @Test
     void update_event() throws SQLException, CloneNotSupportedException {
-        Event eventA = new Event(1, 1, EventType.move_bus);
+        Event eventA = new Event("1", "1", 1, 3);
         db.addEvent(eventA);
 
         Event eventB = (Event)eventA.clone();
-        eventB.setTime(10);
+        eventB.setArrivalTime(10);
 
 
         db.updateEvent(eventA, eventB);
@@ -184,8 +188,8 @@ class SQLiteDatabaseTest {
     @Test
     void remove_bus() throws Exception {
         Route R = new Route("0", "0", "0");
-        Bus A = new Bus(0, R, 0, 0, 0, 0, 0, 0, 0);
-        Bus B = new Bus(1, R, 1, 1, 1, 1, 1, 1, 1);
+        Bus A = new Bus("0", R, true, 0, 0, 0, 0, 0, 0, 0);
+        Bus B = new Bus("1", R, true, 1, 1, 1, 1, 1, 1, 1);
 
         db.addRoute(R);
         db.addBus(A);
@@ -235,8 +239,8 @@ class SQLiteDatabaseTest {
 
     @Test
     void remove_event() throws SQLException {
-        Event A = new Event(0,0, EventType.move_bus);
-        Event B = new Event(1,1, EventType.move_bus);
+        Event A = new Event("0", "0", 0, 0);
+        Event B = new Event("1", "1", 1, 1);
 
         db.addEvent(A);
         db.addEvent(B);
@@ -259,7 +263,7 @@ class SQLiteDatabaseTest {
     @Test
     void read_bus() throws Exception {
         Route A = new Route("0", "0", "0");
-        Bus B = new Bus(0, A, 0, 0, 0, 0, 0, 0, 0);
+        Bus B = new Bus("0", A, true, 0, 0, 0, 0, 0, 0, 0);
 
         db.addRoute(A);
         db.addBus(B);
@@ -281,9 +285,9 @@ class SQLiteDatabaseTest {
         Route A = new Route("0", "0", "0");
         Route B = new Route("1", "1", "1");
         Route C = new Route("2", "2", "2");
-        Bus X = new Bus(0, A, 0, 0, 0, 0, 0, 0, 0);
-        Bus Y = new Bus(1, B, 1, 1, 5, 5, 0, 0, 0);
-        Bus Z = new Bus(2, C, 2, 2, 10, 10, 0, 0, 0);
+        Bus X = new Bus("0", A, true, 0, 0, 0, 0, 0, 0, 0);
+        Bus Y = new Bus("1", B, true, 1, 1, 5, 5, 0, 0, 0);
+        Bus Z = new Bus("2", C, true, 2, 2, 10, 10, 0, 0, 0);
         Collection<Bus> buses = new HashSet<>(Arrays.asList(X, Y, Z));
 
         db.addRoute(A);
@@ -301,9 +305,9 @@ class SQLiteDatabaseTest {
     void read_all_buses_routeid() throws Exception {
         Route A = new Route("0", "0", "0");
         Route B = new Route("1", "1", "1");
-        Bus X = new Bus(0, A, 0, 0, 0, 0, 0, 0, 0);
-        Bus Y = new Bus(1, B, 1, 1, 5, 5, 0, 0, 0);
-        Bus Z = new Bus(2, B, 2, 2, 10, 10, 0, 0, 0);
+        Bus X = new Bus("0", A, true, 0, 0, 0, 0, 0, 0, 0);
+        Bus Y = new Bus("1", B, true, 1, 1, 5, 5, 0, 0, 0);
+        Bus Z = new Bus("2", B, true, 2, 2, 10, 10, 0, 0, 0);
         Collection<Bus> buses = new HashSet<>(Arrays.asList(Y, Z));
 
         db.addRoute(A);
@@ -348,9 +352,9 @@ class SQLiteDatabaseTest {
 
     @Test
     void read_all_events() throws SQLException {
-        Event A = new Event(0, 0, EventType.move_bus);
-        Event B = new Event(1, 2, EventType.move_bus);
-        Event C = new Event(2, 5, EventType.move_bus);
+        Event A = new Event("0", "0", 0, 0);
+        Event B = new Event("1", "2", 3, 4);
+        Event C = new Event("2", "5", 5, 5);
         Collection<Event> events = new HashSet<>(Arrays.asList(A, B, C));
 
 
@@ -363,11 +367,10 @@ class SQLiteDatabaseTest {
     }
 
     @Test
-    void read_all_events_time() throws SQLException {
-        Event A = new Event(0, 0, EventType.move_bus);
-        Event B = new Event(1, 5, EventType.move_bus);
-        Event C = new Event(2, 5, EventType.move_bus);
-        Collection<Event> events = new HashSet<>(Arrays.asList(B, C));
+    void read_all_events_arrival_time() throws SQLException {
+        Event A = new Event("0", "0", 0, 0);
+        Event B = new Event("1", "2", 3, 4);
+        Event C = new Event("2", "5", 3, 5);
 
 
         db.addEvent(A);
@@ -375,6 +378,6 @@ class SQLiteDatabaseTest {
         db.addEvent(C);
         assertEquals(3, db.getAllEvents().size());
 
-        assertEquals(events, new HashSet<>(db.getAllEventsWithTime(5)));
+        assertEquals(new HashSet<>(Arrays.asList(B, C)), new HashSet<>(db.getAllEventsWithArrivalTime(3)));
     }
 }

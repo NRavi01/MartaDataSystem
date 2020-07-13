@@ -1,6 +1,9 @@
 package com.martasim.datamgmt;
 
-import com.martasim.models.*;
+import com.martasim.models.Bus;
+import com.martasim.models.Event;
+import com.martasim.models.Route;
+import com.martasim.models.Stop;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -102,7 +105,7 @@ public interface Database {
      * @return Bus object with corresponding id
      * @throws SQLException
      */
-    Bus getBus(int id) throws SQLException;
+    Bus getBus(String id) throws SQLException;
 
     /**
      * Gets a Route from the database
@@ -148,32 +151,32 @@ public interface Database {
     Collection<Event> getAllEvents() throws SQLException;
 
     /**
-     * Gets all events from the database with the corresponding time
-     *
-     * @param id of object that corresponds to the event
-     * @return Collection of Events with corresponding id
+     * @param busId related to event
+     * @return Collection of Events with corresponding busId
      * @throws SQLException
      */
-    Collection<Event> getAllEventsWithId(int id) throws SQLException;
+    Collection<Event> getAllEventsWithBusId(int busId) throws SQLException;
 
     /**
-     * Gets all events from the database with the corresponding time
-     *
-     * @param time of event
-     * @return Collection of Events with corresponding time
+     * @param stopId related to event
+     * @return Collection of Events with corresponding stopId
      * @throws SQLException
      */
-    Collection<Event> getAllEventsWithTime(int time) throws SQLException;
-
+    Collection<Event> getAllEventsWithStopId(int stopId) throws SQLException;
 
     /**
-     * Gets all events from the database with the corresponding time
-     *
-     * @param type of event
-     * @return Collection of Events with corresponding type
+     * @param arrivalTime of Bus
+     * @return Collection of Events with buses arriving at a stop at the given arrivalTime
      * @throws SQLException
      */
-    Collection<Event> getAllEventsWithType(EventType type) throws SQLException;
+    Collection<Event> getAllEventsWithArrivalTime(int arrivalTime) throws SQLException;
+
+    /**
+     * @param departureTime of Bus
+     * @return Collection of Events with buses leaving a stop at the given departureTime
+     * @throws SQLException
+     */
+    Collection<Event> getAllEventsWithDepartureTime(int departureTime) throws SQLException;
 
     /**
      * Gets all routes from the database
